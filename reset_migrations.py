@@ -38,7 +38,6 @@ for file_path in migrations_dir.glob('*.py'):
 print("Creating new initial migration file...")
 with open(migrations_dir / '0001_initial.py', 'w') as f:
     f.write("""from django.db import migrations, models
-import django.db.models.deletion
 from django.conf import settings
 
 
@@ -57,12 +56,24 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('message', models.TextField()),
                 ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sent_messages', to=settings.AUTH_USER_MODEL)),
-                ('receiver', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='received_messages', to=settings.AUTH_USER_MODEL)),
+                ('sender_id', models.IntegerField()),
+                ('receiver_id', models.IntegerField()),
             ],
             options={
                 'ordering': ['timestamp'],
             },
+        ),
+        migrations.RunSQL(
+            # SQL to run for SQLite compatibility
+            '''
+            CREATE INDEX chat_chatmessage_sender_id_idx ON chat_chatmessage (sender_id);
+            CREATE INDEX chat_chatmessage_receiver_id_idx ON chat_chatmessage (receiver_id);
+            ''',
+            # SQL to run when reversing the migration
+            '''
+            DROP INDEX IF EXISTS chat_chatmessage_sender_id_idx;
+            DROP INDEX IF EXISTS chat_chatmessage_receiver_id_idx;
+            '''
         ),
     ]
 """)
