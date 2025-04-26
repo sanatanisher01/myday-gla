@@ -55,16 +55,21 @@ except Exception as e:
         fi
     done
 
-    # Run migrations
-    echo "Running migrations..."
-    python manage.py migrate --noinput
+    # Run migrations with fake-initial to avoid CASCADE issues
+    echo "Running migrations with fake-initial..."
+    python manage.py migrate --fake-initial
+
+    # Run setup_railway command
+    echo "Running setup_railway command..."
+    python manage.py setup_railway
 
     # Initialize database with sample data
     echo "Initializing database with sample data..."
     python manage.py initialize_db
 else
     echo "DATABASE_URL is not set, using SQLite database..."
-    python manage.py migrate
+    python manage.py migrate --fake-initial
+    python manage.py setup_railway
     python manage.py initialize_db
 fi
 
