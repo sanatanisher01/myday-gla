@@ -55,9 +55,17 @@ except Exception as e:
         fi
     done
 
-    # Run migrations with fake-initial to avoid CASCADE issues
-    echo "Running migrations with fake-initial..."
-    python manage.py migrate --fake-initial
+    # Reset migrations for the chat app
+    echo "Resetting migrations for the chat app..."
+    python manage.py reset_migrations
+
+    # Make migrations
+    echo "Making migrations..."
+    python manage.py makemigrations
+
+    # Run migrations
+    echo "Running migrations..."
+    python manage.py migrate
 
     # Run setup_railway command
     echo "Running setup_railway command..."
@@ -68,7 +76,9 @@ except Exception as e:
     python manage.py initialize_db
 else
     echo "DATABASE_URL is not set, using SQLite database..."
-    python manage.py migrate --fake-initial
+    python manage.py reset_migrations
+    python manage.py makemigrations
+    python manage.py migrate
     python manage.py setup_railway
     python manage.py initialize_db
 fi
