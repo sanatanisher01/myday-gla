@@ -32,9 +32,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-hy&j5v%e!bxdub681qn3))0*ik-yq9#y0b0!5x0if$t_a3c(mi')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.railway.app']  # Allow Railway domains
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.railway.app', '*']  # Allow all hosts in production
 
 # CSRF settings for secure cookies
 CSRF_COOKIE_SECURE = not DEBUG
