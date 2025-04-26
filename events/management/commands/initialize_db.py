@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.contrib.auth.models import User
-from events.models import Category, Event
+from events.models import Category, Event, SubEvent
 from accounts.models import UserProfile  # Changed from Profile to UserProfile
 import os
 import sys
@@ -46,35 +46,39 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(f"Error creating superuser: {e}")
 
-        # Create categories if they don't exist
+        # Create a sample event and categories
         try:
-            categories = ['Wedding', 'Birthday', 'Corporate', 'Festival', 'Other']
-            for category_name in categories:
-                Category.objects.get_or_create(name=category_name)
-            self.stdout.write(self.style.SUCCESS('Categories created successfully'))
-        except Exception as e:
-            self.stdout.write(f"Error creating categories: {e}")
+            # First, create a main event
+            if not Event.objects.exists():
+                event = Event.objects.create(
+                    name='Sample Event',
+                    description='This is a sample event created during initialization',
+                    created_by=User.objects.get(username='admin')
+                )
+                self.stdout.write(self.style.SUCCESS('Sample event created successfully'))
 
-        # Create a sample event if none exist
-        try:
-            if Event.objects.count() == 0:
-                category = Category.objects.first()
-                if category:
-                    Event.objects.create(
-                        name='Sample Event',
-                        description='This is a sample event created during initialization',
-                        location='Sample Location',
-                        capacity=100,
-                        price=1000,
-                        category=category,
-                        manager=User.objects.get(username='admin')
+                # Create a sub-event for this event
+                sub_event = SubEvent.objects.create(
+                    event=event,
+                    name='Sample Sub-Event',
+                    description='This is a sample sub-event',
+                    price=1000
+                )
+                self.stdout.write(self.style.SUCCESS('Sample sub-event created successfully'))
+
+                # Create categories for this sub-event
+                categories = ['Wedding', 'Birthday', 'Corporate', 'Festival', 'Other']
+                for category_name in categories:
+                    Category.objects.create(
+                        sub_event=sub_event,
+                        name=category_name,
+                        description=f'Sample {category_name} category',
+                        price=500
                     )
-                    self.stdout.write(self.style.SUCCESS('Sample event created successfully'))
-                else:
-                    self.stdout.write('No categories found, skipping sample event creation')
+                self.stdout.write(self.style.SUCCESS('Categories created successfully'))
             else:
-                self.stdout.write('Events already exist, skipping sample event creation')
+                self.stdout.write('Events already exist, skipping sample event and category creation')
         except Exception as e:
-            self.stdout.write(f"Error creating sample event: {e}")
+            self.stdout.write(f"Error creating sample event and categories: {e}")
 
-        self.stdout.write(self.style.SUCCESS('Database initialization completed'))
+        # Additional initialization can be added here if needed
