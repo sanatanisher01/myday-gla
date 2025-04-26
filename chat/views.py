@@ -64,8 +64,8 @@ def chat_room(request, user_id):
         if message_text:
             # Create the message
             ChatMessage.objects.create(
-                sender_id=request.user.id,
-                receiver_id=other_user.id,
+                sender=request.user,
+                receiver=other_user,
                 message=message_text
             )
 

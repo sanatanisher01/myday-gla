@@ -1,27 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class ChatRoom(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    users = models.ManyToManyField(User, related_name='chat_rooms')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
 class ChatMessage(models.Model):
-    sender_id = models.IntegerField()
-    receiver_id = models.IntegerField()
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['timestamp']
 
-    @property
-    def sender(self):
-        return User.objects.get(id=self.sender_id)
-
-    @property
-    def receiver(self):
-        return User.objects.get(id=self.receiver_id)
-
     def __str__(self):
-        try:
-            sender_username = User.objects.get(id=self.sender_id).username
-            receiver_username = User.objects.get(id=self.receiver_id).username
-            return f"{sender_username} to {receiver_username}: {self.message[:50]}"
-        except User.DoesNotExist:
-            return f"Message {self.id}: {self.message[:50]}"
+        return f"{self.sender.username} to {self.receiver.username}: {self.message[:50]}"
