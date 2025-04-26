@@ -72,22 +72,26 @@ python manage.py runserver
 
 8. Visit `http://127.0.0.1:8000/` in your browser.
 
-### Deployment on Render
+### Deployment on Railway
 
-This project is configured for deployment on Render. The deployment is automated using the `render.yaml` configuration file.
+This project is configured for deployment on Railway. The deployment is automated using the `railway.json` configuration file.
 
 #### Prerequisites
 
-1. A Render account
+1. A Railway account
 2. A Cloudinary account for media storage
 3. (Optional) An email service account for sending emails
 
 #### Deployment Steps
 
 1. Fork or clone this repository to your GitHub account
-2. Connect your GitHub repository to Render
-3. Render will automatically detect the `render.yaml` file and set up the services
-4. Configure the environment variables in the Render dashboard:
+2. Create a new project on Railway
+3. Connect your GitHub repository to Railway
+4. Add a PostgreSQL database to your project
+5. Configure the environment variables in the Railway dashboard:
+   - `DJANGO_SECRET_KEY`: A secure random key for Django
+   - `DJANGO_DEBUG`: Set to False for production
+   - `RAILWAY_ENVIRONMENT`: Set to production
    - `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
    - `CLOUDINARY_API_KEY`: Your Cloudinary API key
    - `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
@@ -98,12 +102,11 @@ This project is configured for deployment on Render. The deployment is automated
 
 If you prefer to set up the deployment manually:
 
-1. Create a new Web Service on Render
+1. Create a new service on Railway
 2. Connect your GitHub repository
-3. Set the build command to `./build.sh`
-4. Set the start command to `gunicorn myday.wsgi:application`
-5. Add the environment variables listed above
-6. Create a PostgreSQL database and link it to your web service
+3. Railway will automatically detect the `Procfile` and deploy your application
+4. Add the environment variables listed above
+5. Create a PostgreSQL database and link it to your service
 
 ## Email Functionality
 
@@ -156,7 +159,7 @@ python manage.py send_event_reminders --days=1
 - SMTP: Email sending
 - Gunicorn: WSGI HTTP Server
 - WhiteNoise: Static file serving
-- Render: Cloud hosting platform
+- Railway: Cloud hosting platform
 
 ## License
 

@@ -17,7 +17,7 @@ class DatabaseErrorMiddleware:
         # Print database configuration on startup
         print("Database configuration at middleware initialization:", file=sys.stderr)
         print(f"DATABASE_URL exists: {bool(os.environ.get('DATABASE_URL'))}", file=sys.stderr)
-        print(f"RENDER: {os.environ.get('RENDER')}", file=sys.stderr)
+        print(f"RAILWAY_ENVIRONMENT: {os.environ.get('RAILWAY_ENVIRONMENT')}", file=sys.stderr)
         print(f"Database engine: {settings.DATABASES['default']['ENGINE']}", file=sys.stderr)
         print(f"Database name: {settings.DATABASES['default']['NAME']}", file=sys.stderr)
 

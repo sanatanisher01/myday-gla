@@ -34,7 +34,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-hy&j5v%e!bxdub
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']  # Allow all hosts while debugging
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.railway.app']  # Allow Railway domains
 
 # CSRF settings for secure cookies
 CSRF_COOKIE_SECURE = not DEBUG
@@ -110,39 +110,30 @@ WSGI_APPLICATION = 'myday.wsgi.application'
 # Database configuration
 import sys
 
-# Check if running on Render (production)
-IS_RENDER = os.environ.get('RENDER', '') == 'true'
+# Check if running in production (Railway or other platform)
+IS_PRODUCTION = os.environ.get('RAILWAY_ENVIRONMENT', '') == 'production'
 
 # Print debug information
-print(f"Running on Render: {IS_RENDER}", file=sys.stderr)
+print(f"Running in production: {IS_PRODUCTION}", file=sys.stderr)
 print(f"DEBUG mode: {DEBUG}", file=sys.stderr)
 
-if IS_RENDER:
-    # Production database (PostgreSQL on Render)
-    DATABASE_URL = os.environ.get('DATABASE_URL', '')
-    print(f"DATABASE_URL: {DATABASE_URL}", file=sys.stderr)
+# Database configuration
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
+print(f"DATABASE_URL exists: {bool(DATABASE_URL)}", file=sys.stderr)
 
-    if DATABASE_URL:
-        print("Using PostgreSQL database from DATABASE_URL", file=sys.stderr)
-        DATABASES = {
-            'default': dj_database_url.config(
-                default=DATABASE_URL,
-                conn_max_age=600,
-                conn_health_checks=True,
-            )
-        }
-    else:
-        # Use SQLite as fallback even in production when DATABASE_URL is not set
-        print("DATABASE_URL not found, using SQLite as fallback", file=sys.stderr)
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
+if DATABASE_URL:
+    # Production or staging database (PostgreSQL)
+    print("Using PostgreSQL database from DATABASE_URL", file=sys.stderr)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 else:
     # Local development - use SQLite
-    print("Using SQLite database for local development", file=sys.stderr)
+    print("DATABASE_URL not found, using SQLite database", file=sys.stderr)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
