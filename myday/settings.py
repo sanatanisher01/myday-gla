@@ -132,16 +132,12 @@ if IS_RENDER:
             )
         }
     else:
-        # Explicit PostgreSQL configuration as fallback
-        print("DATABASE_URL not found, using explicit PostgreSQL configuration", file=sys.stderr)
+        # Use SQLite as fallback even in production when DATABASE_URL is not set
+        print("DATABASE_URL not found, using SQLite as fallback", file=sys.stderr)
         DATABASES = {
             'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'myday',
-                'USER': 'myday',
-                'PASSWORD': '',  # Password should be in DATABASE_URL
-                'HOST': 'localhost',
-                'PORT': '5432',
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
             }
         }
 else:
