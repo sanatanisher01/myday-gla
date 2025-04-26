@@ -10,16 +10,28 @@ from .forms import EventForm, SubEventForm, CategoryForm, EventGalleryForm, Revi
 # Test like view removed
 
 def home(request):
-    # Get featured events (for example, events with most bookings)
-    featured_events = Event.objects.annotate(booking_count=Count('bookings')).order_by('-booking_count')[:3]
+    # Try to get featured events and testimonials
+    try:
+        # Get featured events (for example, events with most bookings)
+        featured_events = Event.objects.annotate(booking_count=Count('bookings')).order_by('-booking_count')[:3]
 
-    # Get testimonials (top-rated reviews)
-    testimonials = Review.objects.filter(rating__gte=4).order_by('-created_at')[:3]
+        # Get testimonials (top-rated reviews)
+        testimonials = Review.objects.filter(rating__gte=4).order_by('-created_at')[:3]
 
-    context = {
-        'featured_events': featured_events,
-        'testimonials': testimonials
-    }
+        context = {
+            'featured_events': featured_events,
+            'testimonials': testimonials
+        }
+    except Exception as e:
+        # If there's an error (e.g., database tables don't exist yet), use empty lists
+        import sys
+        print(f"Error in home view: {e}", file=sys.stderr)
+        context = {
+            'featured_events': [],
+            'testimonials': [],
+            'setup_mode': True,
+            'error_message': str(e)
+        }
 
     return render(request, 'events/home.html', context)
 

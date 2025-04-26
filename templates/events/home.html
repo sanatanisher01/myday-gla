@@ -8,6 +8,19 @@
 {% endblock %}
 
 {% block content %}
+{% if setup_mode %}
+<div class="alert alert-info text-center py-4 mb-0" role="alert">
+    <h4 class="alert-heading"><i class="fas fa-tools me-2"></i>Setting Up Your Database</h4>
+    <p>We're currently setting up the database for your MyDay application. This may take a few minutes.</p>
+    <hr>
+    <p class="mb-0">Please refresh the page in a few moments to see the full site.</p>
+    {% if error_message %}
+    <div class="mt-3">
+        <small class="text-muted">Technical details: {{ error_message }}</small>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="container text-center">
