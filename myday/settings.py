@@ -108,28 +108,45 @@ WSGI_APPLICATION = 'myday.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Database configuration
-# Force PostgreSQL in production
-DATABASE_URL = os.environ.get('DATABASE_URL', '')
-
-# Print debug information about environment variables
 import sys
-print("DATABASE_URL:", DATABASE_URL, file=sys.stderr)
-print("RENDER env var:", os.environ.get('RENDER', 'not set'), file=sys.stderr)
-print("All environment variables:", os.environ, file=sys.stderr)
 
-# Always use PostgreSQL if DATABASE_URL is set
-if DATABASE_URL:
-    print("Using PostgreSQL database", file=sys.stderr)
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+# Check if running on Render (production)
+IS_RENDER = os.environ.get('RENDER', '') == 'true'
+
+# Print debug information
+print(f"Running on Render: {IS_RENDER}", file=sys.stderr)
+print(f"DEBUG mode: {DEBUG}", file=sys.stderr)
+
+if IS_RENDER:
+    # Production database (PostgreSQL on Render)
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+    print(f"DATABASE_URL: {DATABASE_URL}", file=sys.stderr)
+
+    if DATABASE_URL:
+        print("Using PostgreSQL database from DATABASE_URL", file=sys.stderr)
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    else:
+        # Explicit PostgreSQL configuration as fallback
+        print("DATABASE_URL not found, using explicit PostgreSQL configuration", file=sys.stderr)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'myday',
+                'USER': 'myday',
+                'PASSWORD': '',  # Password should be in DATABASE_URL
+                'HOST': 'localhost',
+                'PORT': '5432',
+            }
+        }
 else:
-    print("Using SQLite database", file=sys.stderr)
-    # Fallback to SQLite for local development
+    # Local development - use SQLite
+    print("Using SQLite database for local development", file=sys.stderr)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

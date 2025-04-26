@@ -75,17 +75,30 @@
             </div>
             <h1>We're Setting Things Up!</h1>
             <p>Our team is currently setting up the MyDay application. We're working hard to get everything ready for you. Please check back in a few minutes.</p>
-            
+
             <div class="progress">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 75%"></div>
             </div>
-            
+
             <p class="text-muted">Estimated time remaining: A few minutes</p>
-            
-            <button class="btn btn-primary" onclick="window.location.reload();">
+
+            {% if error_message %}
+            <div class="alert alert-info mt-4">
+                <h5><i class="fas fa-info-circle me-2"></i>Technical Details</h5>
+                <p class="small mb-0">{{ error_message }}</p>
+                {% if attempt %}
+                <p class="small mt-2 mb-0">Connection attempt {{ attempt }} of {{ max_attempts }}</p>
+                {% endif %}
+                {% if during_request %}
+                <p class="small mt-2 mb-0">Error occurred during request processing</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <button type="button" class="btn btn-primary" onclick="window.location.reload();">
                 <i class="fas fa-sync-alt me-2"></i> Refresh Page
             </button>
-            
+
             <div class="features">
                 <div class="feature">
                     <i class="fas fa-calendar-alt"></i>
@@ -100,7 +113,7 @@
                     <p>Professional Management</p>
                 </div>
             </div>
-            
+
             <p class="mt-5 mb-0 small text-muted">© 2025 MyDay - GLA University</p>
         </div>
     </div>

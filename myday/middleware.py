@@ -1,30 +1,76 @@
 from django.shortcuts import render
-from django.db.utils import OperationalError, ProgrammingError
+from django.db.utils import OperationalError, ProgrammingError, InterfaceError
+from django.conf import settings
 import sys
+import os
+import time
 
 class DatabaseErrorMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.db_check_attempts = 0
+        self.max_db_check_attempts = 3
+        self.last_check_time = 0
+        self.check_interval = 60  # seconds between checks
+        self.db_available = False
 
     def __call__(self, request):
-        try:
-            # Try to access the database
-            from django.db import connection
-            cursor = connection.cursor()
-            cursor.execute("SELECT 1")
-            
-            # If we get here, the database is working
-            response = self.get_response(request)
-            return response
-            
-        except (OperationalError, ProgrammingError) as e:
-            # Log the error
-            print(f"Database error: {e}", file=sys.stderr)
-            
-            # Return the maintenance page
-            return render(request, 'maintenance.html')
-        except Exception as e:
-            # Log other errors but let them pass through
-            print(f"Other error in middleware: {e}", file=sys.stderr)
-            response = self.get_response(request)
-            return response
+        # Skip database check for static files and maintenance page
+        if request.path.startswith('/static/') or request.path == '/maintenance/':
+            return self.get_response(request)
+
+        # Only check database connection periodically to avoid overloading the database
+        current_time = time.time()
+        if current_time - self.last_check_time > self.check_interval or self.db_check_attempts < self.max_db_check_attempts:
+            self.last_check_time = current_time
+            self.db_check_attempts += 1
+
+            try:
+                # Try to access the database
+                from django.db import connection
+                cursor = connection.cursor()
+                cursor.execute("SELECT 1")
+                cursor.fetchone()
+                cursor.close()
+
+                # If we get here, the database is working
+                self.db_available = True
+                print(f"Database connection successful on attempt {self.db_check_attempts}", file=sys.stderr)
+
+            except (OperationalError, ProgrammingError, InterfaceError) as e:
+                # Log the error
+                print(f"Database error on attempt {self.db_check_attempts}: {e}", file=sys.stderr)
+                print(f"DATABASE_URL exists: {bool(os.environ.get('DATABASE_URL'))}", file=sys.stderr)
+                print(f"RENDER: {os.environ.get('RENDER')}", file=sys.stderr)
+                print(f"Database settings: {settings.DATABASES['default']['ENGINE']}", file=sys.stderr)
+
+                self.db_available = False
+
+                # Return the maintenance page
+                return render(request, 'maintenance.html', {
+                    'error_message': str(e),
+                    'attempt': self.db_check_attempts,
+                    'max_attempts': self.max_db_check_attempts
+                })
+
+            except Exception as e:
+                # Log other errors
+                print(f"Other error in middleware on attempt {self.db_check_attempts}: {e}", file=sys.stderr)
+                self.db_available = False
+
+        # If database is available or we've exceeded check attempts, proceed with the request
+        if self.db_available or self.db_check_attempts >= self.max_db_check_attempts:
+            try:
+                response = self.get_response(request)
+                return response
+            except (OperationalError, ProgrammingError, InterfaceError) as e:
+                # Handle database errors that occur during request processing
+                print(f"Database error during request processing: {e}", file=sys.stderr)
+                return render(request, 'maintenance.html', {
+                    'error_message': str(e),
+                    'during_request': True
+                })
+            except Exception as e:
+                # Log other errors but let them pass through
+                print(f"Other error during request processing: {e}", file=sys.stderr)
+                raise
