@@ -32,9 +32,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-hy&j5v%e!bxdub681qn3))0*ik-yq9#y0b0!5x0if$t_a3c(mi')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+# Temporarily set DEBUG to True to diagnose 500 errors
+DEBUG = True
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
+ALLOWED_HOSTS = ['*']  # Allow all hosts while debugging
 
 # CSRF settings for secure cookies
 CSRF_COOKIE_SECURE = not DEBUG
@@ -167,19 +168,23 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# WhiteNoise configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# WhiteNoise configuration - using simpler storage to avoid 500 errors
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 WHITENOISE_MAX_AGE = 31536000 if not DEBUG else 0  # 1 year in production
 
 # File Storage settings
 # Using Cloudinary for media storage
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dbxwr2avj'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '353298813117544'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', '0-tBjIKSrVMiYFaN9AxNleOV-eg')
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', '')
 }
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Only use Cloudinary if credentials are provided
+if all(CLOUDINARY_STORAGE.values()):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Media files
 MEDIA_URL = '/media/'
