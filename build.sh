@@ -11,7 +11,16 @@ python manage.py collectstatic --no-input
 # Apply database migrations only if DATABASE_URL is set
 if [ -n "$DATABASE_URL" ]; then
     echo "Database URL is set, running migrations..."
-    python manage.py migrate
+
+    # Wait for PostgreSQL to be ready
+    echo "Waiting for PostgreSQL to be ready..."
+    sleep 10
+
+    # Run migrations
+    python manage.py migrate --noinput
+
+    # Create a superuser if needed (optional)
+    # python manage.py createsuperuser --noinput --username admin --email admin@example.com
 else
     echo "Database URL is not set, skipping migrations..."
 fi

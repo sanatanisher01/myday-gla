@@ -32,8 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-hy&j5v%e!bxdub681qn3))0*ik-yq9#y0b0!5x0if$t_a3c(mi')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Temporarily set DEBUG to True to diagnose 500 errors
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']  # Allow all hosts while debugging
 
@@ -107,18 +106,31 @@ WSGI_APPLICATION = 'myday.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Use SQLite locally and PostgreSQL on Render
-if os.environ.get('DATABASE_URL'):
-    # Parse database configuration from $DATABASE_URL
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+# Database configuration
+# Check if running on Render.com (production)
+IS_RENDER = os.environ.get('RENDER', '') == 'true'
+
+if IS_RENDER:
+    # Running on Render.com - use PostgreSQL
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+    if DATABASE_URL:
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    else:
+        # Fallback to SQLite if DATABASE_URL is not set (should not happen in production)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
-    # Use SQLite as fallback
+    # Local development - use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
