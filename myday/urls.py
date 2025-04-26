@@ -18,7 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import render
 from events import views
+
+# Simple view for maintenance page
+def maintenance_view(request):
+    return render(request, 'maintenance.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +31,7 @@ urlpatterns = [
     path('events/', include('events.urls')),
     path('bookings/', include('bookings.urls')),
     path('chat/', include('chat.urls')),
+    path('maintenance/', maintenance_view, name='maintenance'),  # Direct maintenance page
     path('', views.home, name='home'),  # Home page view directly included
 ]
 
