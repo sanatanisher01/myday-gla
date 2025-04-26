@@ -2,82 +2,83 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-from .models import ChatRoom, ChatMessage
-import uuid
+from django.db.models import Q
+from .models import ChatMessage
 import cloudinary
 import cloudinary.uploader
 
 @login_required
 def chat_home(request):
-    # Get all chat rooms for the current user
-    chat_rooms = ChatRoom.objects.filter(users=request.user).order_by('-updated_at')
+    # Get all users the current user has chatted with
+    chat_partners = User.objects.filter(
+        Q(sent_messages__receiver=request.user) | Q(received_messages__sender=request.user)
+    ).distinct()
 
-    # Add other_user and message info to each chat room
-    for room in chat_rooms:
-        room.other_user = room.users.exclude(id=request.user.id).first()
-        # Get the last message for this room
-        last_message = ChatMessage.objects.filter(room_name=room.name).order_by('-created_at').first()
-        room.last_message = last_message
-        # Count unread messages
-        room.unread_count = ChatMessage.objects.filter(room_name=room.name, is_read=False).exclude(sender=request.user).count()
+    # For each chat partner, get the latest message and count of unread messages
+    chat_list = []
+    for partner in chat_partners:
+        # Get the latest message between these users
+        latest_message = ChatMessage.objects.filter(
+            (Q(sender=request.user) & Q(receiver=partner)) |
+            (Q(sender=partner) & Q(receiver=request.user))
+        ).order_by('-timestamp').first()
+
+        if latest_message:
+            chat_list.append({
+                'user': partner,
+                'latest_message': latest_message,
+                'timestamp': latest_message.timestamp
+            })
+
+    # Sort by latest message timestamp
+    chat_list.sort(key=lambda x: x['timestamp'], reverse=True)
 
     # Get all users for the new conversation modal
     # Exclude the current user and users they already have conversations with
-    existing_chat_users = User.objects.filter(chat_rooms__in=chat_rooms).distinct()
-    available_users = User.objects.exclude(id=request.user.id).exclude(id__in=existing_chat_users)
+    available_users = User.objects.exclude(
+        id__in=[request.user.id] + [chat['user'].id for chat in chat_list]
+    )
 
     context = {
-        'chat_rooms': chat_rooms,
+        'chat_list': chat_list,
         'available_users': available_users
     }
 
     return render(request, 'chat/chat_home.html', context)
 
 @login_required
-def chat_room(request, room_id):
-    # Get the chat room
-    chat_room = get_object_or_404(ChatRoom, id=room_id, users=request.user)
+def chat_room(request, user_id):
+    # Get the other user
+    other_user = get_object_or_404(User, id=user_id)
 
-    # Get all messages for this room
-    chat_messages = ChatMessage.objects.filter(room_name=chat_room.name)
-
-    # Mark unread messages as read
-    unread_messages = chat_messages.filter(is_read=False).exclude(sender=request.user)
-    unread_messages.update(is_read=True)
-
-    # Get the other user in the chat
-    other_user = chat_room.users.exclude(id=request.user.id).first()
+    # Get all messages between these users
+    messages = ChatMessage.objects.filter(
+        (Q(sender=request.user) & Q(receiver=other_user)) |
+        (Q(sender=other_user) & Q(receiver=request.user))
+    ).order_by('timestamp')
 
     # Handle message submission
     if request.method == 'POST':
         message_text = request.POST.get('message')
-        message_type = request.POST.get('message_type', 'text')
-        file_url = request.POST.get('file_url')
 
         if message_text:
             # Create the message
             ChatMessage.objects.create(
                 sender=request.user,
-                room_name=chat_room.name,
-                message=message_text,
-                message_type=message_type,
-                file_url=file_url
+                receiver=other_user,
+                message=message_text
             )
-
-            # Update the chat room's updated_at timestamp
-            chat_room.save()  # This will update the auto_now field
 
             # If it's an AJAX request, return JSON response
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'status': 'success'})
 
             # Otherwise redirect back to the chat room
-            return redirect('chat_room', room_id=room_id)
+            return redirect('chat_room', user_id=user_id)
 
     context = {
-        'chat_room': chat_room,
-        'messages': chat_messages,
         'other_user': other_user,
+        'messages': messages,
     }
 
     return render(request, 'chat/chat_room.html', context)
@@ -87,27 +88,14 @@ def create_chat(request, user_id):
     # Get the user to chat with
     other_user = get_object_or_404(User, id=user_id)
 
-    # Check if a chat room already exists with these users
-    existing_rooms = ChatRoom.objects.filter(users=request.user).filter(users=other_user)
-
-    if existing_rooms.exists():
-        # Use the existing room
-        chat_room = existing_rooms.first()
-    else:
-        # Create a new room with a unique name
-        room_name = f"chat_{uuid.uuid4().hex[:10]}"
-        chat_room = ChatRoom.objects.create(name=room_name)
-        chat_room.users.add(request.user, other_user)
-
-    return redirect('chat_room', room_id=chat_room.id)
+    # Redirect to the chat room with this user
+    return redirect('chat_room', user_id=other_user.id)
 
 @login_required
 def upload_file(request):
     if request.method == 'POST' and request.FILES.get('file'):
         try:
             file = request.FILES['file']
-
-            # Cloudinary is already configured in settings
 
             # Determine file type
             file_name = file.name.lower()
