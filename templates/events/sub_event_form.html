@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if sub_event %}Edit{% else %}Create{% endif %} Sub-Event - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 2rem;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .form-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .event-info {
+        background-color: rgba(67, 97, 238, 0.05);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .price-input {
+        position: relative;
+    }
+
+    .price-input::before {
+        content: '₹';
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 10;
+    }
+
+    .price-input input {
+        padding-left: 30px;
+    }
+
+    .image-preview {
+        width: 100%;
+        height: 200px;
+        border-radius: var(--border-radius);
+        object-fit: cover;
+        margin-top: 1rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .image-preview-container {
+        position: relative;
+    }
+
+    .image-preview-placeholder {
+        width: 100%;
+        height: 200px;
+        border-radius: var(--border-radius);
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1rem;
+        border: 2px dashed #dee2e6;
+    }
+
+    .image-preview-placeholder i {
+        font-size: 3rem;
+        color: #adb5bd;
+    }
+
+    .form-section-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container" data-aos="fade-up">
+                <div class="form-header">
+                    <h1>{% if sub_event %}Edit{% else %}Create{% endif %} Sub-Event</h1>
+                    <p class="text-muted">{% if sub_event %}Update your sub-event details{% else %}Add a new sub-event to your event{% endif %}</p>
+                </div>
+
+                {% if event %}
+                <div class="event-info">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <img src="{{ event.cover_photo.url }}" alt="{{ event.name }}" class="rounded" width="60" height="60" style="object-fit: cover;">
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ event.name }}</h5>
+                            <p class="mb-0 text-muted small">Adding sub-event to this event</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="form-section-title">Cover Image</h5>
+                        <p class="text-muted small mb-3">Upload an image that represents this sub-event. Recommended size: 800x400 pixels.</p>
+
+                        {{ form.cover_image|as_crispy_field }}
+
+                        <div class="image-preview-container">
+                            {% if sub_event and sub_event.cover_image %}
+                                <img src="{{ sub_event.cover_image.url }}" alt="{{ sub_event.name }}" class="image-preview" id="cover-preview">
+                            {% else %}
+                                <div class="image-preview-placeholder" id="cover-preview-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <img src="" alt="Cover Preview" class="image-preview d-none" id="cover-preview">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4 price-input">
+                        {{ form.price|as_crispy_field }}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'event_detail' event.slug %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> {% if sub_event %}Update{% else %}Create{% endif %} Sub-Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Image preview functionality
+        const coverImageInput = document.getElementById('id_cover_image');
+        const coverPreview = document.getElementById('cover-preview');
+        const coverPreviewPlaceholder = document.getElementById('cover-preview-placeholder');
+
+        if (coverImageInput && coverPreview) {
+            coverImageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        coverPreview.src = e.target.result;
+                        coverPreview.classList.remove('d-none');
+                        if (coverPreviewPlaceholder) {
+                            coverPreviewPlaceholder.classList.add('d-none');
+                        }
+                    }
+
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

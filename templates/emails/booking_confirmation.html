@@ -1,0 +1,60 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}Booking Confirmation - MyDay{% endblock %}
+
+{% block header_title %}Booking Confirmation{% endblock %}
+
+{% block content %}
+<p>Dear {{ booking.user.get_full_name|default:booking.user.username }},</p>
+
+<p>Thank you for booking with MyDay! Your booking for <strong>{{ booking.event.name }}</strong> has been received and is currently pending approval from the event manager.</p>
+
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Booking Details</h3>
+    <p><strong>Booking ID:</strong> {{ booking.booking_id }}</p>
+    <p><strong>Event:</strong> {{ booking.event.name }}</p>
+    <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+    <p><strong>Guest Count:</strong> {{ booking.guest_count }}</p>
+    <p><strong>Status:</strong> <span style="color: #ff9f1c; font-weight: bold;">Pending</span></p>
+    <p><strong>Total Price:</strong> ₹{{ booking.total_price }}</p>
+    <p><strong>Final Price:</strong> ₹{{ booking.final_price }}</p>
+
+    {% if sub_events %}
+    <h4 style="margin-top: 20px;">Selected Sub-Events</h4>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding: 8px; border-bottom: 1px solid #dee2e6;">Sub-Event</th>
+                <th style="text-align: right; padding: 8px; border-bottom: 1px solid #dee2e6;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sub_event_booking in sub_events %}
+            <tr>
+                <td style="padding: 8px; border-bottom: 1px solid #dee2e6;">{{ sub_event_booking.sub_event.name }}</td>
+                <td style="text-align: right; padding: 8px; border-bottom: 1px solid #dee2e6;">₹{{ sub_event_booking.sub_event.price }}</td>
+            </tr>
+                {% for category_booking in sub_event_booking.category_bookings.all %}
+                <tr>
+                    <td style="padding: 8px 8px 8px 20px; border-bottom: 1px solid #dee2e6; color: #6c757d;">- {{ category_booking.category.name }}</td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #dee2e6; color: #6c757d;">₹{{ category_booking.category.price }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<p>You will receive another email once your booking has been reviewed by the event manager.</p>
+
+<div class="text-center">
+    <a href="{{ site_url }}{% url 'booking_detail' booking.booking_id %}" class="btn">View Booking Details</a>
+</div>
+
+<p>If you have any questions or need to make changes to your booking, please contact us or reply to this email.</p>
+
+<p>Thank you for choosing MyDay for your event needs!</p>
+
+<p>Best regards,<br>The MyDay Team</p>
+{% endblock %}

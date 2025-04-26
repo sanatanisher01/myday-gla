@@ -1,0 +1,33 @@
+{% load static %}
+<div class="testimonial-card" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); padding: 25px; height: 100%; display: block !important; position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+    <div class="d-flex align-items-center mb-4">
+        <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #4361ee; color: white; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+            <i class="fas fa-user"></i>
+        </div>
+        <div>
+            <h5 style="margin-bottom: 5px; font-weight: 700; color: #2b2d42;">{{ name }}</h5>
+            <div style="color: #ffbe0b;">
+                {% for i in rating %}
+                    <i class="{{ i }}"></i>
+                {% endfor %}
+            </div>
+            <p style="font-size: 0.8rem; color: #8d99ae; margin-bottom: 0; margin-top: 5px;">{{ date }}</p>
+        </div>
+    </div>
+    <div class="review-content">
+        {% if comment|length > 150 %}
+            <p class="review-text">
+                <span class="short-text">"{{ comment|slice:':150' }}..."</span>
+                <span class="full-text" style="display: none;">"{{ comment }}"</span>
+            </p>
+            <div class="text-start">
+                <button class="btn btn-sm btn-link read-more-btn p-0" data-review-id="demo-{{ id }}">
+                    <small>Read more</small>
+                </button>
+            </div>
+        {% else %}
+            <p class="review-text">"{{ comment }}"</p>
+            <!-- No additional controls for short reviews -->
+        {% endif %}
+    </div>
+</div>

@@ -1,0 +1,29 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}Event Reminder - MyDay{% endblock %}
+
+{% block header_title %}Event Reminder{% endblock %}
+
+{% block content %}
+<p>Dear {{ booking.user.get_full_name|default:booking.user.username }},</p>
+
+<p>This is a friendly reminder that your event <strong>{{ booking.event.name }}</strong> is coming up soon!</p>
+
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Event Details</h3>
+    <p><strong>Booking ID:</strong> {{ booking.booking_id }}</p>
+    <p><strong>Event:</strong> {{ booking.event.name }}</p>
+    <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+    <p><strong>Guest Count:</strong> {{ booking.guest_count }}</p>
+</div>
+
+<p>We're looking forward to making your event special. If you have any last-minute questions or requests, please don't hesitate to contact the event manager.</p>
+
+<div class="text-center">
+    <a href="{{ site_url }}{% url 'booking_detail' booking.booking_id %}" class="btn">View Booking Details</a>
+</div>
+
+<p>Thank you for choosing MyDay for your event needs!</p>
+
+<p>Best regards,<br>The MyDay Team</p>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if event %}Edit{% else %}Create{% endif %} Event - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 2rem;
+    }
+    
+    .form-header {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .form-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .form-section-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .image-preview {
+        width: 100%;
+        height: 200px;
+        border-radius: var(--border-radius);
+        object-fit: cover;
+        margin-top: 1rem;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .image-preview-container {
+        position: relative;
+    }
+    
+    .image-preview-placeholder {
+        width: 100%;
+        height: 200px;
+        border-radius: var(--border-radius);
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1rem;
+        border: 2px dashed #dee2e6;
+    }
+    
+    .image-preview-placeholder i {
+        font-size: 3rem;
+        color: #adb5bd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container" data-aos="fade-up">
+                <div class="form-header">
+                    <h1>{% if event %}Edit{% else %}Create{% endif %} Event</h1>
+                    <p class="text-muted">{% if event %}Update your event details{% else %}Create a new event for your customers{% endif %}</p>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <h4 class="form-section-title">Basic Information</h4>
+                        {{ form.name|as_crispy_field }}
+                        {{ form.description|as_crispy_field }}
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4 class="form-section-title">Cover Image</h4>
+                        <p class="text-muted small mb-3">Upload a high-quality image that represents your event. Recommended size: 1200x600 pixels.</p>
+                        
+                        {{ form.cover_photo|as_crispy_field }}
+                        
+                        <div class="image-preview-container">
+                            {% if event and event.cover_photo %}
+                                <img src="{{ event.cover_photo.url }}" alt="{{ event.name }}" class="image-preview" id="cover-preview">
+                            {% else %}
+                                <div class="image-preview-placeholder" id="cover-preview-placeholder">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <img src="" alt="Cover Preview" class="image-preview d-none" id="cover-preview">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'manager_events' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> {% if event %}Update{% else %}Create{% endif %} Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Image preview functionality
+        const coverPhotoInput = document.getElementById('id_cover_photo');
+        const coverPreview = document.getElementById('cover-preview');
+        const coverPreviewPlaceholder = document.getElementById('cover-preview-placeholder');
+        
+        if (coverPhotoInput && coverPreview) {
+            coverPhotoInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        coverPreview.src = e.target.result;
+                        coverPreview.classList.remove('d-none');
+                        if (coverPreviewPlaceholder) {
+                            coverPreviewPlaceholder.classList.add('d-none');
+                        }
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

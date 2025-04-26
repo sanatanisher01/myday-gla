@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="#2e1a47"/>
+
+  <!-- Border -->
+  <circle cx="256" cy="256" r="252" stroke="white" stroke-width="4" fill="none"/>
+
+  <!-- MD Text -->
+  <text x="170" y="300" font-family="Arial, sans-serif" font-size="180" font-weight="bold" fill="white">M</text>
+  <text x="340" y="300" font-family="Arial, sans-serif" font-size="180" font-weight="bold" fill="#FFD700">D</text>
+</svg>

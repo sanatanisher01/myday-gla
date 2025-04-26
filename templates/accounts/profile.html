@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - MyDay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Profile Information</h4>
+                </div>
+                <div class="card-body text-center">
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle img-fluid mb-3" style="max-width: 150px;">
+                    {% else %}
+                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <i class="fas fa-user fa-5x"></i>
+                        </div>
+                    {% endif %}
+                    <h3>{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-muted">@{{ user.username }}</p>
+                    <p><i class="fas fa-envelope me-2"></i> {{ user.email }}</p>
+                    {% if user.profile.mobile_number %}
+                        <p><i class="fas fa-phone me-2"></i> {{ user.profile.mobile_number }}</p>
+                    {% endif %}
+                    {% if user.profile.address %}
+                        <p><i class="fas fa-map-marker-alt me-2"></i> {{ user.profile.address }}</p>
+                    {% endif %}
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-edit me-2"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            {% if user.profile.is_manager %}
+                <div class="card shadow">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">Manager Dashboard</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>You have manager privileges. Access your manager dashboard to create and manage events.</p>
+                        <a href="{% url 'manager_dashboard' %}" class="btn btn-success">
+                            <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Recent Bookings</h4>
+                </div>
+                <div class="card-body">
+                    {% if user.bookings.all %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Price</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in user.bookings.all|slice:":5" %}
+                                        <tr>
+                                            <td>{{ booking.event.name }}</td>
+                                            <td>{{ booking.booking_date }}</td>
+                                            <td>
+                                                {% if booking.status == 'pending' %}
+                                                    <span class="badge bg-warning">Pending</span>
+                                                {% elif booking.status == 'approved' %}
+                                                    <span class="badge bg-success">Approved</span>
+                                                {% elif booking.status == 'rejected' %}
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                {% elif booking.status == 'cancelled' %}
+                                                    <span class="badge bg-secondary">Cancelled</span>
+                                                {% elif booking.status == 'completed' %}
+                                                    <span class="badge bg-info">Completed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>₹{{ booking.final_price }}</td>
+                                            <td>
+                                                <a href="{% url 'booking_detail' booking.booking_id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary">View All Bookings</a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                            <h5>No Bookings Yet</h5>
+                            <p>You haven't made any bookings yet. Browse our events and book your first event!</p>
+                            <a href="{% url 'event_list' %}" class="btn btn-primary mt-2">Browse Events</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Account Settings</h4>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'edit_profile' %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Edit Profile</h5>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <p class="mb-1">Update your personal information and profile picture</p>
+                        </a>
+                        <a href="{% url 'password_reset' %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Change Password</h5>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <p class="mb-1">Update your password for security</p>
+                        </a>
+                        <a href="{% url 'chat_home' %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Messages</h5>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <p class="mb-1">View and manage your conversations</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

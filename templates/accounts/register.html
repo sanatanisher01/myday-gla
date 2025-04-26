@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Register - MyDay{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card card" data-aos="fade-up">
+        <div class="card-header text-center">
+            <div class="auth-logo-container mb-3">
+                <img src="{% static 'images/logos/myday-logo.png' %}" alt="MyDay Logo" class="auth-logo">
+            </div>
+            <h3 class="mb-0">Join MyDay</h3>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">Create your account and start booking amazing events!</p>
+            <form method="POST" class="auth-form">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary auth-btn w-100 mt-4">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+            </form>
+        </div>
+        <div class="card-footer text-center">
+            <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Log In</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

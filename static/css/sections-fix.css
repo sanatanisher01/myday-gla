@@ -1,0 +1,328 @@
+/* Complete redesign for problematic sections */
+
+/* How It Works Section */
+.how-it-works {
+    padding: 80px 0 !important;
+    background-color: #ffffff !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+}
+
+.how-it-works .section-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    color: #2b2d42 !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 100 !important;
+    display: block !important;
+}
+
+.how-it-works .section-subtitle {
+    font-size: 1.1rem !important;
+    color: #8d99ae !important;
+    margin-bottom: 3rem !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 100 !important;
+    display: block !important;
+}
+
+.feature-card {
+    background-color: #ffffff !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    padding: 30px !important;
+    margin-bottom: 30px !important;
+    transition: all 0.3s ease !important;
+    height: 100% !important;
+    display: block !important;
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e6f0ff, #f0e6ff);
+    border: 2px solid #3a86ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    color: #3a86ff;
+}
+
+.feature-card:hover .feature-icon {
+    background: linear-gradient(135deg, #3a86ff, #ff006e);
+    color: white;
+}
+
+.feature-card .card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2b2d42;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.feature-card .card-text {
+    color: #8d99ae;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.feature-card .card-footer {
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+    margin-top: auto;
+}
+
+.feature-card .step-number {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: #3a86ff;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    font-weight: 700;
+    margin-right: 10px;
+}
+
+/* Featured Events Section */
+.featured-events {
+    padding: 80px 0 !important;
+    background-color: #f8f9fa !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+}
+
+.featured-events .section-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    color: #2b2d42 !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 100 !important;
+    display: block !important;
+}
+
+.featured-events .section-subtitle {
+    font-size: 1.1rem !important;
+    color: #8d99ae !important;
+    margin-bottom: 3rem !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 100 !important;
+    display: block !important;
+}
+
+.event-card {
+    background-color: #ffffff !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden !important;
+    margin-bottom: 30px !important;
+    transition: all 0.3s ease !important;
+    height: 100% !important;
+    display: block !important;
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+.event-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.event-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.event-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.event-card .badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #3a86ff, #ff006e);
+    color: white;
+    font-weight: 600;
+    padding: 8px 15px;
+    border-radius: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.event-card .card-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.event-card .card-title {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 0;
+    font-size: 1.3rem;
+}
+
+.event-card .card-body {
+    padding: 20px;
+}
+
+.event-card .card-text {
+    color: #8d99ae;
+    margin-bottom: 20px;
+}
+
+.event-card .event-meta {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #8d99ae;
+    font-size: 0.9rem;
+}
+
+.event-card .event-meta i {
+    color: #3a86ff;
+    margin-right: 8px;
+}
+
+.event-card .rating {
+    color: #ffbe0b;
+}
+
+.event-card .price {
+    font-weight: 700;
+    color: #3a86ff;
+    font-size: 1.2rem;
+}
+
+.event-card .btn-view {
+    background: linear-gradient(135deg, #3a86ff, #2a75ee);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.event-card .btn-view:hover {
+    background: linear-gradient(135deg, #2a75ee, #3a86ff);
+    transform: translateY(-2px);
+}
+
+/* Benefits Section */
+.benefits {
+    padding: 80px 0 !important;
+    background-color: #ffffff !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: visible !important;
+}
+
+.benefits .section-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    color: #2b2d42 !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 100 !important;
+    display: block !important;
+}
+
+.benefits .section-subtitle {
+    font-size: 1.1rem !important;
+    color: #8d99ae !important;
+    margin-bottom: 3rem !important;
+    text-align: center !important;
+    position: relative !important;
+    z-index: 100 !important;
+    display: block !important;
+}
+
+.benefits-img {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
+    border: 5px solid white;
+}
+
+.benefit-item {
+    background-color: #ffffff !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+    padding: 20px !important;
+    margin-bottom: 25px !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+.benefit-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-icon {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e6f0ff, #f0e6ff);
+    border: 2px solid #3a86ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    font-size: 1.5rem;
+    color: #3a86ff;
+}
+
+.benefit-item:hover .benefit-icon {
+    background: linear-gradient(135deg, #3a86ff, #ff006e);
+    color: white;
+}
+
+.benefit-item h5 {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #2b2d42;
+}
+
+.benefit-item p {
+    color: #8d99ae;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}

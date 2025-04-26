@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 2rem;
+    }
+    
+    .form-header {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .form-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .discount-code-input {
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="mb-0">{{ title }}</h1>
+                    <p class="text-muted">{% if discount %}Edit existing discount code{% else %}Create a new discount code{% endif %}</p>
+                </div>
+                <div>
+                    <a href="{% url 'discount_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Discounts
+                    </a>
+                </div>
+            </div>
+            
+            <div class="form-container">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-tag me-2"></i> Discount Information
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form.code|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.percentage|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-calendar-alt me-2"></i> Validity Period
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                {{ form.valid_from|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.valid_to|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-info-circle me-2"></i> Additional Details
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                {{ form.description|as_crispy_field }}
+                            </div>
+                            <div class="col-12">
+                                {{ form.is_active|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'discount_list' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if discount %}Update{% else %}Create{% endif %} Discount
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Generate random discount code
+        const codeInput = document.getElementById('id_code');
+        
+        if (codeInput && !codeInput.value) {
+            const generateRandomCode = function() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 8; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return code;
+            };
+            
+            // Add a generate button next to the code input
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            
+            const parent = codeInput.parentNode;
+            parent.insertBefore(inputGroup, codeInput);
+            inputGroup.appendChild(codeInput);
+            
+            const generateBtn = document.createElement('button');
+            generateBtn.type = 'button';
+            generateBtn.className = 'btn btn-outline-secondary';
+            generateBtn.innerHTML = '<i class="fas fa-random"></i>';
+            generateBtn.addEventListener('click', function() {
+                codeInput.value = generateRandomCode();
+            });
+            
+            inputGroup.appendChild(generateBtn);
+            
+            // Add monospace font to code input
+            codeInput.classList.add('discount-code-input');
+        }
+    });
+</script>
+{% endblock %}

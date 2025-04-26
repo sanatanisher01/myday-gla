@@ -1,0 +1,572 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat with {{ other_user.get_full_name|default:other_user.username }} | MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: calc(100vh - 200px);
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-header {
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .chat-message {
+        margin-bottom: 15px;
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 10px;
+        position: relative;
+    }
+
+    .chat-message.sent {
+        background-color: #dcf8c6;
+        margin-left: auto;
+        border-bottom-right-radius: 0;
+    }
+
+    .chat-message.received {
+        background-color: #f1f0f0;
+        margin-right: auto;
+        border-bottom-left-radius: 0;
+    }
+
+    .chat-message .timestamp {
+        font-size: 11px;
+        color: #999;
+        margin-top: 5px;
+        text-align: right;
+    }
+
+    .chat-footer {
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .chat-input-wrapper {
+        display: flex;
+        align-items: center;
+    }
+
+    .chat-input {
+        flex: 1;
+        border-radius: 20px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+    }
+
+    .chat-send-btn {
+        margin-left: 10px;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+    .chat-send-btn:hover {
+        background-color: #0069d9;
+    }
+
+    .file-message {
+        display: flex;
+        align-items: center;
+        background-color: rgba(0,0,0,0.05);
+        padding: 8px;
+        border-radius: 5px;
+    }
+
+    .file-message i {
+        margin-right: 8px;
+        font-size: 20px;
+    }
+
+    .upload-preview {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+        display: none;
+    }
+
+    .attachment-options {
+        position: relative;
+    }
+
+    .attachment-btn {
+        background: none;
+        border: none;
+        color: #6c757d;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0 10px;
+    }
+
+    .attachment-dropdown {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        display: none;
+        z-index: 10;
+    }
+
+    .attachment-dropdown.show {
+        display: block;
+    }
+
+    .attachment-option {
+        padding: 10px 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    .attachment-option:hover {
+        background-color: #f8f9fa;
+    }
+
+    .attachment-option i {
+        margin-right: 10px;
+    }
+
+    /* Hidden file inputs */
+    .hidden-file-input {
+        display: none;
+    }
+
+    /* Avatar styles */
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* WhatsApp-like media styles for both images and videos */
+    .chat-media-container {
+        max-width: 250px;
+        display: inline-block;
+    }
+
+    .chat-media {
+        max-height: 200px;
+        max-width: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s;
+        border-radius: 8px;
+    }
+
+    .chat-media:hover {
+        transform: scale(1.03);
+    }
+
+    /* Video specific styles */
+    .chat-video {
+        max-height: 200px;
+        max-width: 100%;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    /* Play button overlay for videos */
+    .video-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .video-play-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <a href="{% url 'chat_home' %}" class="btn btn-outline-secondary mb-3">
+                <i class="fas fa-arrow-left me-2"></i> Back to Messages
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card chat-container">
+                <div class="chat-header d-flex align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar me-3">
+                            {% if other_user.profile.profile_picture %}
+                                <img src="{{ other_user.profile.profile_picture.url }}" alt="{{ other_user.get_full_name }}" class="img-fluid rounded-circle" width="40">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center avatar-placeholder">
+                                    {{ other_user.first_name|first|upper }}{{ other_user.last_name|first|upper }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h5 class="mb-0">{{ other_user.get_full_name|default:other_user.username }}</h5>
+                            <small class="text-muted">
+                                {% if other_user.profile.is_manager %}Manager{% else %}User{% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    {% for message in messages %}
+                        <div class="chat-message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                            {% if message.message_type == 'image' %}
+                                <div class="chat-media-container">
+                                    <img src="{{ message.file_url|default:message.message }}" class="chat-media" alt="{{ message.message }}" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="{{ message.file_url|default:message.message }}">
+                                    <div class="mt-1 small text-muted">{{ message.message }}</div>
+                                </div>
+                            {% elif message.message_type == 'video' %}
+                                <div class="chat-media-container">
+                                    <div class="video-container">
+                                        <video class="chat-video" data-bs-toggle="modal" data-bs-target="#videoModal" data-video-src="{{ message.file_url|default:message.message }}">
+                                            <source src="{{ message.file_url|default:message.message }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        <div class="video-play-button">
+                                            <i class="fas fa-play"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1 small text-muted">{{ message.message }}</div>
+                                </div>
+                            {% else %}
+                                {{ message.message }}
+                            {% endif %}
+                            <div class="timestamp">{{ message.created_at|date:"M d, g:i a" }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-comments fa-3x mb-3"></i>
+                            <p>No messages yet. Start the conversation!</p>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="upload-preview" id="upload-preview">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div id="preview-content"></div>
+                        <button type="button" id="cancel-upload" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-footer">
+                    <form method="POST" id="message-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="message_type" id="message-type" value="text">
+                        <input type="hidden" name="file_url" id="file-url" value="">
+
+                        <div class="chat-input-wrapper">
+                            <div class="attachment-options me-2">
+                                <button type="button" class="attachment-btn" id="attachment-btn" aria-label="Add attachment" title="Add attachment">
+                                    <i class="fas fa-paperclip" aria-hidden="true"></i>
+                                </button>
+                                <div class="attachment-dropdown" id="attachment-dropdown">
+                                    <div class="attachment-option" id="image-option">
+                                        <i class="fas fa-image"></i> Image
+                                    </div>
+                                    <div class="attachment-option" id="video-option">
+                                        <i class="fas fa-video"></i> Video
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="text" class="chat-input" name="message" id="message-input" placeholder="Type a message..." required>
+                            <button type="submit" class="chat-send-btn" aria-label="Send message" title="Send message">
+                                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <input type="file" id="image-input" accept="image/*" class="hidden-file-input">
+                    <input type="file" id="video-input" accept="video/*" class="hidden-file-input">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" class="img-fluid" id="modalImage" alt="Full size image">
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary" id="downloadImage" download><i class="fas fa-download me-2"></i>Download</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoModalLabel">Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <video controls class="img-fluid" id="modalVideo">
+                    <source src="" type="video/mp4" id="modalVideoSource">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-primary" id="downloadVideo" download><i class="fas fa-download me-2"></i>Download</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scroll to bottom of chat
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Handle image modal
+        const imageModal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const downloadImage = document.getElementById('downloadImage');
+        const modalImageTitle = document.getElementById('imageModalLabel');
+
+        // When an image is clicked, show it in the modal
+        document.querySelectorAll('.chat-media').forEach(image => {
+            image.addEventListener('click', function() {
+                const imgSrc = this.getAttribute('data-img-src');
+                const imgAlt = this.getAttribute('alt');
+                modalImage.src = imgSrc;
+                modalImageTitle.textContent = imgAlt || 'Image';
+                downloadImage.href = imgSrc;
+                downloadImage.setAttribute('download', imgAlt || 'image');
+            });
+        });
+
+        // Handle video modal
+        const videoModal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalVideoSource = document.getElementById('modalVideoSource');
+        const downloadVideo = document.getElementById('downloadVideo');
+        const modalVideoTitle = document.getElementById('videoModalLabel');
+
+        // When a video is clicked, show it in the modal
+        document.querySelectorAll('.video-container').forEach(container => {
+            container.addEventListener('click', function() {
+                const video = this.querySelector('.chat-video');
+                const videoSrc = video.getAttribute('data-video-src');
+                const videoName = this.closest('.chat-media-container').querySelector('.text-muted').textContent.trim();
+
+                modalVideoSource.src = videoSrc;
+                modalVideo.load(); // Important: reload the video with the new source
+                modalVideoTitle.textContent = videoName || 'Video';
+                downloadVideo.href = videoSrc;
+                downloadVideo.setAttribute('download', videoName || 'video');
+            });
+        });
+
+        // Pause videos when modal is closed
+        videoModal.addEventListener('hidden.bs.modal', function () {
+            modalVideo.pause();
+        });
+
+        // Attachment dropdown
+        const attachmentBtn = document.getElementById('attachment-btn');
+        const attachmentDropdown = document.getElementById('attachment-dropdown');
+
+        attachmentBtn.addEventListener('click', function() {
+            attachmentDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!attachmentBtn.contains(e.target) && !attachmentDropdown.contains(e.target)) {
+                attachmentDropdown.classList.remove('show');
+            }
+        });
+
+        // File upload variables
+        const imageInput = document.getElementById('image-input');
+        const videoInput = document.getElementById('video-input');
+        const imageOption = document.getElementById('image-option');
+        const videoOption = document.getElementById('video-option');
+        const uploadPreview = document.getElementById('upload-preview');
+        const previewContent = document.getElementById('preview-content');
+        const cancelUpload = document.getElementById('cancel-upload');
+        const messageType = document.getElementById('message-type');
+        const fileUrl = document.getElementById('file-url');
+
+        let currentFile = null;
+
+        // Image upload
+        imageOption.addEventListener('click', function() {
+            imageInput.click();
+            attachmentDropdown.classList.remove('show');
+        });
+
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                currentFile = this.files[0];
+                messageType.value = 'image';
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewContent.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-height: 100px;" alt="Image Preview">`;
+                    uploadPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(currentFile);
+            }
+        });
+
+        // Video upload
+        videoOption.addEventListener('click', function() {
+            videoInput.click();
+            attachmentDropdown.classList.remove('show');
+        });
+
+        videoInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                currentFile = this.files[0];
+                messageType.value = 'video';
+
+                // Show preview with video thumbnail if possible
+                try {
+                    const videoURL = URL.createObjectURL(currentFile);
+                    previewContent.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="video-container me-2" style="width: 60px; height: 60px;">
+                                <video class="chat-video" style="width: 60px; height: 60px; object-fit: cover;">
+                                    <source src="${videoURL}" type="video/mp4">
+                                </video>
+                                <div class="video-play-button" style="width: 24px; height: 24px; font-size: 10px;">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                            <div>${currentFile.name}</div>
+                        </div>
+                    `;
+                } catch (e) {
+                    // Fallback if thumbnail creation fails
+                    previewContent.innerHTML = `<div><i class="fas fa-video me-2"></i>${currentFile.name}</div>`;
+                }
+                uploadPreview.style.display = 'block';
+            }
+        });
+
+        // Cancel upload
+        cancelUpload.addEventListener('click', function() {
+            uploadPreview.style.display = 'none';
+            currentFile = null;
+            messageType.value = 'text';
+            fileUrl.value = '';
+            imageInput.value = '';
+            videoInput.value = '';
+        });
+
+        // Handle form submission
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (currentFile) {
+                // Upload file first
+                uploadFile(currentFile);
+                return;
+            }
+
+            // Submit the form normally for text messages
+            this.submit();
+        });
+
+        // Upload file to server
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            // Show loading state
+            previewContent.innerHTML = `<div><i class="fas fa-spinner fa-spin me-2"></i>Uploading...</div>`;
+
+            fetch('{% url "upload_file" %}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    // Set the file URL in the hidden field
+                    fileUrl.value = data.url;
+
+                    // Set message type based on file type
+                    messageType.value = data.file_type || 'file';
+
+                    // Set a more user-friendly message text
+                    messageInput.value = data.filename || currentFile.name;
+
+                    // Reset upload state
+                    currentFile = null;
+                    uploadPreview.style.display = 'none';
+                    // Submit the form
+                    messageForm.submit();
+                } else {
+                    previewContent.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>Upload failed</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+                previewContent.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>Upload failed</div>`;
+            });
+        }
+    });
+</script>
+{% endblock %}

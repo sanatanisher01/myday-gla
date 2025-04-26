@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/benefit-icon.css' %}">
+<link rel="stylesheet" href="{% static 'css/placeholder.css' %}">
+<link rel="stylesheet" href="{% static 'css/event-card.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <div class="hero-content">
+            <h1 class="hero-title" data-aos="fade-down" data-aos-delay="100">Create Unforgettable <span>Moments</span> with MyDay</h1>
+            <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="200">Your premier platform for planning and booking customized events that exceed expectations</p>
+            <div data-aos="fade-up" data-aos-delay="300">
+                <a href="{% url 'event_list' %}" class="btn btn-primary btn-lg me-3">Explore Events</a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg">Join Now</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="hero-stats mt-5" data-aos="fade-up" data-aos-delay="400">
+            <div class="row justify-content-center">
+                <div class="col-md-4 col-sm-6 mb-4 mb-md-0">
+                    <div class="hero-stat-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="stat-value">100+</div>
+                        <div class="stat-label">Unique Events</div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-4 mb-md-0">
+                    <div class="hero-stat-item">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value">500+</div>
+                        <div class="stat-label">Happy Clients</div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="hero-stat-item">
+                        <i class="fas fa-star"></i>
+                        <div class="stat-value">4.9</div>
+                        <div class="stat-label">Customer Rating</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section style="background-color: #ffffff; padding: 80px 0; position: relative;">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-6 mx-auto text-center">
+                <h2 style="font-size: 2.5rem; font-weight: 800; color: #2b2d42; margin-bottom: 1rem;">How It Works</h2>
+                <p style="font-size: 1.1rem; color: #8d99ae; margin-bottom: 3rem;">Simple steps to create your perfect event experience</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100" style="border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: #3a86ff;">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2b2d42; margin-bottom: 15px;">Discover Events</h4>
+                        <p style="color: #8d99ae; margin-bottom: 20px;">Browse our curated collection of premium events and find the perfect match for your special occasion.</p>
+                    </div>
+                    <div class="card-footer bg-transparent text-center border-0 pb-4">
+                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #3a86ff; color: white; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; margin-right: 10px;">1</div>
+                        <span class="fw-bold">Explore Options</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100" style="border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: #3a86ff;">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2b2d42; margin-bottom: 15px;">Personalize Details</h4>
+                        <p style="color: #8d99ae; margin-bottom: 20px;">Customize every aspect of your event with our flexible options, from venue selection to catering preferences.</p>
+                    </div>
+                    <div class="card-footer bg-transparent text-center border-0 pb-4">
+                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #3a86ff; color: white; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; margin-right: 10px;">2</div>
+                        <span class="fw-bold">Make It Yours</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100" style="border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);">
+                    <div class="card-body text-center p-4">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: #3a86ff;">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h4 style="font-size: 1.5rem; font-weight: 700; color: #2b2d42; margin-bottom: 15px;">Confirm & Celebrate</h4>
+                        <p style="color: #8d99ae; margin-bottom: 20px;">Finalize your booking, connect with your dedicated event manager, and enjoy a flawlessly executed celebration.</p>
+                    </div>
+                    <div class="card-footer bg-transparent text-center border-0 pb-4">
+                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #3a86ff; color: white; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; margin-right: 10px;">3</div>
+                        <span class="fw-bold">Enjoy Your Day</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Events Section -->
+<section style="background-color: #f8f9fa; padding: 80px 0; position: relative;">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-6 mx-auto text-center">
+                <h2 style="font-size: 2.5rem; font-weight: 800; color: #2b2d42; margin-bottom: 1rem;">Featured Events</h2>
+                <p style="font-size: 1.1rem; color: #8d99ae; margin-bottom: 3rem;">Discover our most popular and highly-rated celebration experiences</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            {% for event in featured_events %}
+                <div class="col-md-4">
+                    <div class="card h-100" style="border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); overflow: hidden;">
+                        <div class="position-relative">
+                            <img src="{{ event.cover_photo.url }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
+                            <span style="position: absolute; top: 15px; right: 15px; background: linear-gradient(135deg, #3a86ff, #ff006e); color: white; font-weight: 600; padding: 8px 15px; border-radius: 50px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">Featured</span>
+                            <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);">
+                                <h5 style="color: white; font-weight: 700; margin-bottom: 0; font-size: 1.3rem;">{{ event.name }}</h5>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <p style="color: #8d99ae; margin-bottom: 20px;">{{ event.description|truncatechars:100 }}</p>
+
+                            <div style="display: flex; align-items: center; margin-bottom: 15px; color: #8d99ae; font-size: 0.9rem;">
+                                <i class="fas fa-calendar-alt" style="color: #3a86ff; margin-right: 8px;"></i>
+                                <span>{{ event.sub_events.count }} sub-events</span>
+                            </div>
+
+                            {% if event.reviews.count > 0 %}
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; color: #8d99ae; font-size: 0.9rem;">
+                                    <div style="color: #ffbe0b; margin-right: 8px;">
+                                        {% with avg_rating=event.reviews.all|dictsort:"rating"|last %}
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= avg_rating.rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endwith %}
+                                    </div>
+                                    <span>({{ event.reviews.count }} reviews)</span>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span style="font-weight: 700; color: #3a86ff; font-size: 1.2rem;">₹{{ event.total_price }}</span>
+                                <a href="{% url 'event_detail' event.slug %}" style="background: linear-gradient(135deg, #3a86ff, #2a75ee); color: white; border: none; border-radius: 50px; padding: 8px 15px; font-weight: 600; text-decoration: none;">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="card p-5 text-center" style="border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);">
+                        <i class="fas fa-calendar-times fa-4x mb-4" style="color: #3a86ff;"></i>
+                        <h4 class="fw-bold mb-3">No Featured Events Yet</h4>
+                        <p class="mb-4">We're working on curating amazing events for you. Check back soon!</p>
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'event_list' %}" class="btn btn-primary">
+                                <i class="fas fa-calendar-alt me-2"></i> Explore All Events
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if featured_events %}
+            <div class="text-center mt-5">
+                <a href="{% url 'event_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-calendar-alt me-2"></i> Explore All Events
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section style="background-color: #ffffff; padding: 80px 0; position: relative;">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-6 mx-auto text-center">
+                <h2 style="font-size: 2.5rem; font-weight: 800; color: #2b2d42; margin-bottom: 1rem;">Why Choose MyDay?</h2>
+                <p style="font-size: 1.1rem; color: #8d99ae; margin-bottom: 3rem;">We make your special occasions truly memorable</p>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+                <img src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Benefits" class="img-fluid rounded" style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); border: 5px solid white;">
+            </div>
+            <div class="col-lg-6 order-lg-1 mt-4 mt-lg-0">
+                <div style="background-color: #ffffff; border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); padding: 20px; margin-bottom: 25px; display: flex; align-items: flex-start;">
+                    <div style="width: 60px; height: 60px; min-width: 60px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: #3a86ff;">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <h5 style="font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; color: #2b2d42;">Fully Customizable Events</h5>
+                        <p style="color: #8d99ae; margin-bottom: 0; font-size: 0.95rem;">Create your perfect event by selecting from multiple sub-events and optional categories. Tailor every detail to match your vision.</p>
+                    </div>
+                </div>
+                <div style="background-color: #ffffff; border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); padding: 20px; margin-bottom: 25px; display: flex; align-items: flex-start;">
+                    <div style="width: 60px; height: 60px; min-width: 60px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: #3a86ff;">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div>
+                        <h5 style="font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; color: #2b2d42;">Real-time Communication</h5>
+                        <p style="color: #8d99ae; margin-bottom: 0; font-size: 0.95rem;">Chat directly with your assigned event manager to ensure everything is perfect. Share files, images, and get instant responses.</p>
+                    </div>
+                </div>
+                <div style="background-color: #ffffff; border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); padding: 20px; margin-bottom: 25px; display: flex; align-items: flex-start;">
+                    <div style="width: 60px; height: 60px; min-width: 60px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: #3a86ff;">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div>
+                        <h5 style="font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; color: #2b2d42;">Transparent Pricing</h5>
+                        <p style="color: #8d99ae; margin-bottom: 0; font-size: 0.95rem;">See exactly what you're paying for with detailed breakdowns and no hidden fees. Apply discount codes for special offers.</p>
+                    </div>
+                </div>
+                <div style="background-color: #ffffff; border: 2px solid #e9ecef; border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); padding: 20px; margin-bottom: 0; display: flex; align-items: flex-start;">
+                    <div style="width: 60px; height: 60px; min-width: 60px; border-radius: 50%; background: linear-gradient(135deg, #e6f0ff, #f0e6ff); border: 2px solid #3a86ff; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: #3a86ff;">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <h5 style="font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; color: #2b2d42;">Professional Management</h5>
+                        <p style="color: #8d99ae; margin-bottom: 0; font-size: 0.95rem;">Our experienced managers ensure your event runs smoothly from start to finish. Relax and enjoy your special day.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials" style="background-color: #f8f9fa; padding: 80px 0; position: relative; z-index: 999 !important; opacity: 1 !important;">
+    <div class="container" style="position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+        <div class="row mb-5">
+            <div class="col-lg-6 mx-auto text-center">
+                <h2 class="section-title text-center" style="font-size: 2.5rem; font-weight: 800; color: #2b2d42; margin-bottom: 1rem; display: block !important; position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">What Our Customers Say</h2>
+                <p class="section-subtitle" style="font-size: 1.1rem; color: #8d99ae; margin-bottom: 3rem; display: block !important; position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">Hear from clients who have experienced our services</p>
+            </div>
+        </div>
+        <div class="row" style="position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+            {% if testimonials %}
+                {% for review in testimonials %}
+                    <div class="col-md-4 mb-4" style="position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+                        {% include 'events/includes/testimonial_card.html' with review=review %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <!-- Hardcoded testimonial for testing -->
+                <div class="col-md-4 mb-4" style="position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+                    {% include 'events/includes/hardcoded_testimonial.html' with id=1 name='Aryan' rating='fas fa-star,fas fa-star,fas fa-star,fas fa-star,fas fa-star' date='April 21, 2025' comment='Very great event! The team at MyDay made our wedding absolutely perfect. Every detail was taken care of, and our guests were amazed.' %}
+                </div>
+                <div class="col-md-4 mb-4" style="position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+                    {% include 'events/includes/hardcoded_testimonial.html' with id=2 name='Rahul Singh' rating='fas fa-star,fas fa-star,fas fa-star,fas fa-star,far fa-star' date='April 15, 2025' comment='We booked a birthday party through MyDay and it was fantastic! The decorations were beautiful and the staff was very professional. Highly recommended!' %}
+                </div>
+                <div class="col-md-4 mb-4" style="position: relative !important; z-index: 1000 !important; opacity: 1 !important; visibility: visible !important;">
+                    {% include 'events/includes/hardcoded_testimonial.html' with id=3 name='Priya Sharma' rating='fas fa-star,fas fa-star,fas fa-star,fas fa-star,fas fa-star' date='April 10, 2025' comment='Our corporate event was a huge success thanks to MyDay. The attention to detail and the quality of service was exceptional. We will definitely be using their services again!' %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section text-white text-center mb-0">
+    <div class="container">
+        <div class="cta-content" data-aos="fade-up">
+            <h2 class="cta-title">Transform Your Vision Into Reality</h2>
+            <p class="cta-subtitle">Join thousands of satisfied customers who have created unforgettable memories with MyDay</p>
+            <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+                <a href="{% url 'event_list' %}" class="btn btn-light btn-lg px-4 py-3 me-3">
+                    <i class="fas fa-calendar-alt me-2"></i> Explore Events
+                </a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="fas fa-user-plus me-2"></i> Join Now
+                    </a>
+                {% endif %}
+            </div>
+            <div class="cta-features">
+                <div class="row justify-content-center">
+                    <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                        <div class="cta-feature">
+                            <i class="fas fa-lock"></i>
+                            <span>Secure Booking</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                        <div class="cta-feature">
+                            <i class="fas fa-headset"></i>
+                            <span>24/7 Support</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="cta-feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>100% Satisfaction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set authentication state for review functions
+    const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize GSAP animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero section parallax effect
+        gsap.to('.hero-section', {
+            backgroundPosition: '50% 0%',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '.hero-section',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+
+        // Animate section titles
+        gsap.utils.toArray('.section-title').forEach(title => {
+            gsap.from(title, {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: title,
+                    start: 'top 80%'
+                }
+            });
+        });
+
+        // Animate feature cards
+        gsap.from('.feature-card', {
+            duration: 0.8,
+            y: 50,
+            opacity: 0,
+            stagger: 0.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.feature-card',
+                start: 'top 80%'
+            }
+        });
+
+        // Animate event cards
+        gsap.from('.event-card', {
+            duration: 0.8,
+            y: 50,
+            opacity: 0,
+            stagger: 0.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.event-card',
+                start: 'top 80%'
+            }
+        });
+
+        // Animate testimonial cards
+        gsap.from('.testimonial-card', {
+            duration: 0.8,
+            y: 50,
+            opacity: 0,
+            stagger: 0.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.testimonial-card',
+                start: 'top 80%'
+            }
+        });
+
+        // Animate benefit items
+        gsap.from('.benefit-item', {
+            duration: 0.8,
+            x: -50,
+            opacity: 0,
+            stagger: 0.2,
+            ease: 'power3.out',
+            scrollTrigger: {
+                trigger: '.benefit-item',
+                start: 'top 80%'
+            }
+        });
+    });
+</script>
+{% endblock %}

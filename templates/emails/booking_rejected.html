@@ -1,0 +1,33 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}Booking Update - MyDay{% endblock %}
+
+{% block header_title %}Booking Update{% endblock %}
+
+{% block content %}
+<p>Dear {{ booking.user.get_full_name|default:booking.user.username }},</p>
+
+<p>We regret to inform you that your booking for <strong>{{ booking.event.name }}</strong> has been <span style="color: #e71d36; font-weight: bold;">declined</span> by the event manager.</p>
+
+<div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Booking Details</h3>
+    <p><strong>Booking ID:</strong> {{ booking.booking_id }}</p>
+    <p><strong>Event:</strong> {{ booking.event.name }}</p>
+    <p><strong>Date:</strong> {{ booking.booking_date }}</p>
+    <p><strong>Status:</strong> <span style="color: #e71d36; font-weight: bold;">Declined</span></p>
+</div>
+
+<p>This could be due to various reasons such as unavailability on the requested date, capacity constraints, or other scheduling conflicts.</p>
+
+<p>We encourage you to explore other dates or similar events on our platform:</p>
+
+<div class="text-center">
+    <a href="{{ site_url }}{% url 'event_list' %}" class="btn">Browse Events</a>
+</div>
+
+<p>If you have any questions or would like more information about why your booking was declined, please contact our support team or reply to this email.</p>
+
+<p>We apologize for any inconvenience and hope to serve you in the future.</p>
+
+<p>Best regards,<br>The MyDay Team</p>
+{% endblock %}

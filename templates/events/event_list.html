@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Events - MyDay{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/event-card.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <h1 class="mb-3 display-4 fw-bold" data-aos="fade-up">Browse Events</h1>
+            <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">Discover and book amazing events for your special occasions.</p>
+        </div>
+        <div class="col-lg-4 text-lg-end d-flex align-items-center justify-content-lg-end">
+            {% if user.profile.is_manager %}
+                <a href="{% url 'create_event' %}" class="btn btn-primary" data-aos="fade-left">
+                    <i class="fas fa-plus me-2"></i> Create Event
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card mb-5 shadow-sm border-0" data-aos="fade-up" data-aos-delay="200">
+        <div class="card-body p-4">
+            <form method="get" class="row g-3">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-primary"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0" placeholder="Search events..." value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <label for="sort-select" class="visually-hidden">Sort events by</label>
+                    <select id="sort-select" name="sort" class="form-select" aria-label="Sort events by">
+                        <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price (Low to High)</option>
+                        <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price (High to Low)</option>
+                        <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Rating (High to Low)</option>
+                        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i> Filter
+                    </button>
+                </div>
+
+                <!-- Advanced Filters (collapsible) -->
+                <div class="col-12 mt-3">
+                    <a class="btn btn-link text-decoration-none" data-bs-toggle="collapse" href="#advancedFilters" role="button" aria-expanded="false">
+                        <i class="fas fa-sliders-h me-2"></i> Advanced Filters
+                    </a>
+
+                    <div class="collapse mt-3" id="advancedFilters">
+                        <div class="card card-body">
+                            <div class="row g-3">
+                                <!-- Price Range Filter -->
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Price Range (₹)</h6>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label for="min-price" class="form-label">Min Price</label>
+                                            <input type="number" class="form-control" id="min-price" name="min_price"
+                                                min="{{ price_range.min_price|default:0 }}"
+                                                max="{{ price_range.max_price|default:10000 }}"
+                                                value="{{ min_price|default:'' }}" placeholder="Min">
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="max-price" class="form-label">Max Price</label>
+                                            <input type="number" class="form-control" id="max-price" name="max_price"
+                                                min="{{ price_range.min_price|default:0 }}"
+                                                max="{{ price_range.max_price|default:10000 }}"
+                                                value="{{ max_price|default:'' }}" placeholder="Max">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Rating Filter -->
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Minimum Rating</h6>
+                                    <div class="rating-filter">
+                                        <label for="min-rating" class="form-label visually-hidden">Minimum Rating</label>
+                                        <select class="form-select" id="min-rating" name="min_rating" aria-label="Minimum Rating">
+                                            <option value="">Any Rating</option>
+                                            <option value="5" {% if min_rating == '5' %}selected{% endif %}>5 Stars</option>
+                                            <option value="4" {% if min_rating == '4' %}selected{% endif %}>4+ Stars</option>
+                                            <option value="3" {% if min_rating == '3' %}selected{% endif %}>3+ Stars</option>
+                                            <option value="2" {% if min_rating == '2' %}selected{% endif %}>2+ Stars</option>
+                                            <option value="1" {% if min_rating == '1' %}selected{% endif %}>1+ Stars</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clear Filters Button -->
+                {% if search_query or min_price or max_price or min_rating or sort_by != 'name' %}
+                <div class="col-12 text-end mt-3">
+                    <a href="{% url 'event_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i> Clear Filters
+                    </a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Active Filters Summary -->
+    {% if search_query or min_price or max_price or min_rating or sort_by != 'name' %}
+    <div class="alert alert-info mb-4" data-aos="fade-up">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-filter me-2"></i>
+                <strong>Active Filters:</strong>
+                {% if search_query %}<span class="badge bg-primary ms-2">Search: {{ search_query }}</span>{% endif %}
+                {% if min_price %}<span class="badge bg-primary ms-2">Min Price: ₹{{ min_price }}</span>{% endif %}
+                {% if max_price %}<span class="badge bg-primary ms-2">Max Price: ₹{{ max_price }}</span>{% endif %}
+                {% if min_rating %}<span class="badge bg-primary ms-2">{{ min_rating }}+ Stars</span>{% endif %}
+                {% if sort_by != 'name' %}
+                    <span class="badge bg-primary ms-2">
+                        Sorted by:
+                        {% if sort_by == 'price_low' %}Price (Low to High){% endif %}
+                        {% if sort_by == 'price_high' %}Price (High to Low){% endif %}
+                        {% if sort_by == 'rating' %}Rating{% endif %}
+                        {% if sort_by == 'newest' %}Newest{% endif %}
+                    </span>
+                {% endif %}
+            </div>
+            <a href="{% url 'event_list' %}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-times me-1"></i> Clear All
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% for event in events %}
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:"100" }}">
+                <div class="card event-card h-100 shadow-sm">
+                    <div class="position-relative overflow-hidden">
+                        <img src="{{ event.cover_photo.url }}" class="card-img-top" alt="{{ event.name }}">
+                        {% if event.is_featured %}
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge bg-primary rounded-pill px-3 py-2">Featured</span>
+                            </div>
+                        {% endif %}
+                        <div class="card-title-overlay">
+                            <h5 class="card-title text-white fw-bold mb-0">{{ event.name }}</h5>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="card-text text-muted mb-3">{{ event.description|truncatechars:100 }}</p>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                <span class="small text-muted">{{ event.sub_event_count }} sub-events</span>
+                            </div>
+                            {% if event.avg_rating %}
+                                <div class="d-flex align-items-center">
+                                    <div class="text-warning me-1">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= event.avg_rating|floatformat:"0" %}
+                                                <i class="fas fa-star"></i>
+                                            {% elif forloop.counter <= event.avg_rating|add:"0.5"|floatformat:"0" %}
+                                                <i class="fas fa-star-half-alt"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-muted small">({{ event.reviews.count }})</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-primary fw-bold">Starting at ₹{{ event.total_price }}</div>
+                            <a href="{% url 'event_detail' event.slug %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-arrow-right me-1"></i> Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5" data-aos="fade-up">
+                <div class="card shadow-sm p-5 border-0">
+                    <i class="fas fa-search fa-5x text-muted mb-4"></i>
+                    <h3 class="fw-bold">No Events Found</h3>
+
+                    {% if search_query or min_price or max_price or min_rating %}
+                        <p class="text-muted mb-4">No events match your current filter criteria. Try adjusting your filters or clearing them to see all events.</p>
+                        <div class="mt-3">
+                            <a href="{% url 'event_list' %}" class="btn btn-primary">
+                                <i class="fas fa-times me-2"></i> Clear Filters
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-4">There are no events available at the moment. Please check back later.</p>
+                        {% if user.profile.is_manager %}
+                            <div class="mt-3">
+                                <a href="{% url 'create_event' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plus me-2"></i> Create Your First Event
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="mt-3">
+                                <a href="{% url 'home' %}" class="btn btn-primary">
+                                    <i class="fas fa-home me-2"></i> Back to Home
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

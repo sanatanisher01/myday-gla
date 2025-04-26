@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manager Dashboard - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-stats {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        color: white;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .dashboard-stats:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .dashboard-stats::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 8%),
+                          radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.3) 0%, transparent 8%);
+        background-size: 30px 30px, 40px 40px;
+        opacity: 0.4;
+        z-index: 0;
+    }
+
+    .dashboard-stats .content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+
+    .quick-action-card {
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        background-color: white;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .quick-action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .action-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+
+    .booking-item {
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .booking-item:hover {
+        transform: translateX(5px);
+        border-left-color: var(--primary-color);
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .booking-item.pending {
+        border-left-color: var(--warning-color);
+    }
+
+    .booking-item.approved {
+        border-left-color: var(--success-color);
+    }
+
+    .booking-item.rejected {
+        border-left-color: var(--danger-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-0">Manager Dashboard</h1>
+            <p class="text-muted">Welcome back, {{ request.user.first_name|default:request.user.username }}! Here's an overview of your events and bookings.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'create_event' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Create New Event
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="dashboard-stats" data-aos="fade-up" data-aos-delay="100">
+                <div class="content text-center">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ total_events }}</div>
+                    <div class="stat-label">Total Events</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-stats" data-aos="fade-up" data-aos-delay="200">
+                <div class="content text-center">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-value">{{ total_bookings }}</div>
+                    <div class="stat-label">Total Bookings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-stats" data-aos="fade-up" data-aos-delay="300">
+                <div class="content text-center">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value">{{ pending_bookings }}</div>
+                    <div class="stat-label">Pending Bookings</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-stats" data-aos="fade-up" data-aos-delay="400">
+                <div class="content text-center">
+                    <div class="stat-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-value">₹{{ total_revenue }}</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Booking Chart -->
+            <div class="card shadow mb-4" data-aos="fade-up">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Booking Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="bookingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Bookings -->
+            <div class="card shadow" data-aos="fade-up">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Recent Bookings</h5>
+                    <a href="{% url 'manager_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Event</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                    <tr class="booking-item {{ booking.status }}">
+                                        <td><small class="text-muted">#{{ booking.booking_id|truncatechars:8 }}</small></td>
+                                        <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
+                                        <td>{{ booking.event.name }}</td>
+                                        <td>{{ booking.booking_date }}</td>
+                                        <td>
+                                            {% if booking.status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif booking.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif booking.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% elif booking.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% elif booking.status == 'completed' %}
+                                                <span class="badge bg-info">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>₹{{ booking.final_price }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'manager_booking_detail' booking.booking_id %}" class="btn btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if booking.status == 'pending' %}
+                                                    <a href="{% url 'approve_booking' booking.booking_id %}" class="btn btn-outline-success">
+                                                        <i class="fas fa-check"></i>
+                                                    </a>
+                                                    <a href="{% url 'reject_booking' booking.booking_id %}" class="btn btn-outline-danger">
+                                                        <i class="fas fa-times"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">No bookings found</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card shadow mb-4" data-aos="fade-up">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <a href="{% url 'create_event' %}" class="text-decoration-none">
+                                <div class="quick-action-card text-center h-100">
+                                    <div class="action-icon">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </div>
+                                    <h6>Create Event</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'manager_bookings' %}" class="text-decoration-none">
+                                <div class="quick-action-card text-center h-100">
+                                    <div class="action-icon">
+                                        <i class="fas fa-clipboard-list"></i>
+                                    </div>
+                                    <h6>Manage Bookings</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'manager_events' %}" class="text-decoration-none">
+                                <div class="quick-action-card text-center h-100">
+                                    <div class="action-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <h6>My Events</h6>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'discount_list' %}" class="text-decoration-none">
+                                <div class="quick-action-card text-center h-100">
+                                    <div class="action-icon">
+                                        <i class="fas fa-tags"></i>
+                                    </div>
+                                    <h6>Discounts</h6>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Your Events -->
+            <div class="card shadow mb-4" data-aos="fade-up">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Your Events</h5>
+                    <a href="{% url 'manager_events' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for event in recent_events %}
+                            <a href="{% url 'event_detail' event.slug %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <img src="{{ event.cover_photo.url }}" alt="{{ event.name }}" class="rounded" width="50" height="50" style="object-fit: cover;">
+                                    </div>
+                                    <div class="ms-3 flex-grow-1">
+                                        <h6 class="mb-0">{{ event.name }}</h6>
+                                        <small class="text-muted">{{ event.bookings.count }} bookings</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary rounded-pill">{{ event.sub_events.count }} sub-events</span>
+                                    </div>
+                                </div>
+                            </a>
+                        {% empty %}
+                            <div class="list-group-item text-center py-4">
+                                <p class="mb-0">No events created yet</p>
+                                <a href="{% url 'create_event' %}" class="btn btn-primary btn-sm mt-2">
+                                    <i class="fas fa-plus me-2"></i> Create Event
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <div class="card shadow" data-aos="fade-up">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Booking Conversion Rate</span>
+                            <span class="text-primary">{{ conversion_rate }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ conversion_rate }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Customer Satisfaction</span>
+                            <span class="text-success">{{ satisfaction_rate }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ satisfaction_rate }}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Revenue Growth</span>
+                            <span class="text-info">{{ revenue_growth }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ revenue_growth }}%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Booking statistics chart
+        const ctx = document.getElementById('bookingsChart').getContext('2d');
+
+        // Real booking data from the backend
+        const bookingData = {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [
+                {
+                    label: 'Approved Bookings',
+                    data: {{ monthly_approved|safe }},
+                    backgroundColor: 'rgba(46, 196, 182, 0.5)',
+                    borderColor: 'rgba(46, 196, 182, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                },
+                {
+                    label: 'Pending Bookings',
+                    data: {{ monthly_pending|safe }},
+                    backgroundColor: 'rgba(255, 159, 28, 0.5)',
+                    borderColor: 'rgba(255, 159, 28, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                },
+                {
+                    label: 'Rejected Bookings',
+                    data: {{ monthly_rejected|safe }},
+                    backgroundColor: 'rgba(231, 29, 54, 0.5)',
+                    borderColor: 'rgba(231, 29, 54, 1)',
+                    borderWidth: 2,
+                    tension: 0.3
+                }
+            ]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: bookingData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

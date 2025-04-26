@@ -1,0 +1,36 @@
+/* Tab Title Styling */
+.tab-title-logo {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: #2e1a47;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+    position: relative;
+    border: 1px solid #fff;
+}
+
+.tab-title-logo::before {
+    content: "MD";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    font-weight: bold;
+    color: #fff;
+    line-height: 1;
+}
+
+.tab-title-logo::after {
+    content: "D";
+    position: absolute;
+    top: 50%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    font-weight: bold;
+    color: #FFD700;
+    line-height: 1;
+}

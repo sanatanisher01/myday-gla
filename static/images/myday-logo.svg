@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="60px" viewBox="0 0 200 60" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <g id="MyDay-Logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M40,10 C51.045695,10 60,18.954305 60,30 C60,41.045695 51.045695,50 40,50 C28.954305,50 20,41.045695 20,30 C20,18.954305 28.954305,10 40,10 Z" id="Circle" fill="#4361EE" opacity="0.9"></path>
+        <path d="M36,20 L36,40 L44,40 L44,20 L36,20 Z M28,20 L28,40 L32,40 L32,20 L28,20 Z M48,20 L48,40 L52,40 L52,20 L48,20 Z" id="Calendar" fill="#FFFFFF"></path>
+        <text id="MyDay" font-family="Arial-BoldMT, Arial" font-size="24" font-weight="bold" fill="#333333">
+            <tspan x="70" y="38">MyDay</tspan>
+        </text>
+        <text id="Event-Booking" font-family="ArialMT, Arial" font-size="12" font-weight="normal" fill="#666666">
+            <tspan x="72" y="48">Event Booking</tspan>
+        </text>
+    </g>
+</svg>

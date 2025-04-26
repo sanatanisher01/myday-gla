@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discount Codes - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .discount-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .discount-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background-color: #f8f9fa;
+    }
+
+    .discount-body {
+        padding: 1.5rem;
+    }
+
+    .discount-card {
+        position: relative;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .discount-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .discount-card-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        background-color: #f8f9fa;
+    }
+
+    .discount-card-body {
+        padding: 1.25rem;
+    }
+
+    .discount-card-footer {
+        padding: 1rem 1.25rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background-color: #f8f9fa;
+    }
+
+    .discount-code {
+        font-family: monospace;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: var(--primary-color);
+    }
+
+    .discount-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0.5rem 1rem;
+        border-bottom-left-radius: var(--border-radius);
+        font-weight: 600;
+    }
+
+    .discount-badge.active {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .discount-badge.expired {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+
+    .discount-detail {
+        margin-bottom: 0.75rem;
+    }
+
+    .discount-detail-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #6c757d;
+    }
+
+    .discount-detail-value {
+        font-size: 1rem;
+    }
+
+    .discount-progress {
+        height: 8px;
+        margin-top: 0.5rem;
+    }
+
+    .empty-discounts {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-discounts-icon {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+
+    .discount-form-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .discount-form-header {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .discount-form-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">Discount Codes</h1>
+            <p class="text-muted">Manage discount codes for your events</p>
+        </div>
+        <div>
+            <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
+                <i class="fas fa-plus me-2"></i> Create Discount
+            </button>
+        </div>
+    </div>
+
+    {% if discounts %}
+        <div class="row">
+            {% for discount in discounts %}
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                    <div class="discount-card">
+                        <div class="discount-badge {% if discount.is_active %}active{% else %}expired{% endif %}">
+                            {% if discount.is_active %}
+                                <i class="fas fa-check-circle me-1"></i> Active
+                            {% else %}
+                                <i class="fas fa-times-circle me-1"></i> Expired
+                            {% endif %}
+                        </div>
+
+                        <div class="discount-card-header">
+                            <h5 class="mb-1">{{ discount.name }}</h5>
+                            <div class="discount-code">{{ discount.code }}</div>
+                        </div>
+
+                        <div class="discount-card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="discount-detail">
+                                        <div class="discount-detail-label">
+                                            <i class="fas fa-percentage me-1"></i> Discount
+                                        </div>
+                                        <div class="discount-detail-value">
+                                            {{ discount.discount_percent }}%
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="discount-detail">
+                                        <div class="discount-detail-label">
+                                            <i class="fas fa-calendar-alt me-1"></i> Valid Until
+                                        </div>
+                                        <div class="discount-detail-value">
+                                            {{ discount.valid_until|date:"F d, Y" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="discount-detail">
+                                <div class="discount-detail-label">
+                                    <i class="fas fa-ticket-alt me-1"></i> Usage ({{ discount.times_used }}/{{ discount.max_uses }})
+                                </div>
+                                <div class="progress discount-progress">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ discount.usage_percent }}%" aria-valuenow="{{ discount.usage_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+
+                            {% if discount.description %}
+                                <div class="discount-detail mt-3">
+                                    <div class="discount-detail-label">
+                                        <i class="fas fa-info-circle me-1"></i> Description
+                                    </div>
+                                    <div class="discount-detail-value">
+                                        {{ discount.description }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="discount-card-footer d-flex justify-content-between">
+                            <a href="{% url 'edit_discount' discount.id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </a>
+                            <a href="{% url 'delete_discount' discount.id %}" class="btn btn-outline-danger">
+                                <i class="fas fa-trash-alt me-1"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card shadow" data-aos="fade-up">
+            <div class="card-body empty-discounts">
+                <div class="empty-discounts-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h4>No Discount Codes</h4>
+                <p class="text-muted mb-4">You haven't created any discount codes yet.</p>
+                <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
+                    <i class="fas fa-plus me-2"></i> Create Your First Discount
+                </button>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Create Discount Modal -->
+<div class="modal fade" id="createDiscountModal" tabindex="-1" aria-labelledby="createDiscountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createDiscountModalLabel">Create Discount Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'create_discount' %}">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Discount Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div class="form-text">A name to identify this discount</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="code" class="form-label">Discount Code</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control text-uppercase" id="code" name="code" required>
+                                <button class="btn btn-outline-secondary" type="button" id="generateCode">
+                                    <i class="fas fa-random"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">Code that customers will enter (automatically converted to uppercase)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="discount_percent" class="form-label">Discount Percentage</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="discount_percent" name="discount_percent" min="1" max="100" value="10" required>
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="form-text">Percentage off the total price</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="valid_until" class="form-label">Valid Until</label>
+                            <input type="date" class="form-control" id="valid_until" name="valid_until" required>
+                            <div class="form-text">Expiration date for this discount</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="form-text">Additional details about this discount</div>
+                        </div>
+                    </div>
+                    <div class="text-end mt-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Discount</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Generate random discount code
+        const generateCodeBtn = document.getElementById('generateCode');
+        const codeInput = document.getElementById('code');
+
+        if (generateCodeBtn && codeInput) {
+            // Function to generate a random code
+            const generateRandomCode = function() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 8; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return code;
+            };
+
+            // Generate a random code when the button is clicked
+            generateCodeBtn.addEventListener('click', function() {
+                codeInput.value = generateRandomCode();
+            });
+
+            // Auto-generate a code if the field is empty
+            if (!codeInput.value) {
+                codeInput.value = generateRandomCode();
+            }
+
+            // Force uppercase for discount codes
+            codeInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+
+        // Set default valid until date (30 days from now)
+        const validUntilInput = document.getElementById('valid_until');
+        if (validUntilInput && !validUntilInput.value) {
+            const date = new Date();
+            date.setDate(date.getDate() + 30);
+            const formattedDate = date.toISOString().split('T')[0];
+            validUntilInput.value = formattedDate;
+        }
+    });
+</script>
+{% endblock %}

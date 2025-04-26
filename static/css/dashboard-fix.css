@@ -1,0 +1,29 @@
+/* Dashboard header fix */
+.container-fluid {
+    padding-top: 20px;
+}
+
+/* Fix for the manager dashboard header being overlapped by the navbar */
+.container-fluid h1 {
+    margin-top: 20px;
+}
+
+/* Ensure proper spacing for the dashboard content */
+.container-fluid .row.mb-4 {
+    margin-top: 20px;
+}
+
+/* Adjust the navbar-spacer height to ensure proper spacing */
+.navbar-spacer {
+    height: 80px !important;
+}
+
+/* Make sure the main content has proper padding */
+main.pt-4 {
+    padding-top: 1.5rem !important;
+}
+
+/* Fix for the manager dashboard page specifically */
+body .container-fluid {
+    padding-top: 30px;
+}

@@ -1,0 +1,217 @@
+/* Opacity Improvements for Homepage */
+
+/* Hero Section - Improved Opacity */
+.hero-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')
+                no-repeat center center !important;
+    background-size: cover !important;
+    position: relative;
+    animation: gradientShift 10s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    50% {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    100% {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(67, 97, 238, 0.2) 0%, transparent 70%);
+    z-index: 0;
+    animation: pulseGradient 8s ease-in-out infinite;
+}
+
+@keyframes pulseGradient {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    padding: 2rem;
+    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s ease;
+}
+
+.hero-content:hover {
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.25);
+    transform: translateY(-5px);
+}
+
+/* Navbar - Improved Opacity */
+.navbar {
+    background-color: rgba(33, 37, 41, 0.85) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    backdrop-filter: blur(15px) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+    transition: background-color 0.3s ease;
+}
+
+.navbar:hover {
+    background-color: rgba(33, 37, 41, 0.95) !important;
+}
+
+/* CTA Section - Improved Opacity */
+.cta-section {
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.9) 0%, rgba(58, 86, 212, 0.9) 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.4) 0%, transparent 25%);
+    opacity: 0.6;
+    z-index: 0;
+}
+
+.cta-section .container {
+    position: relative;
+    z-index: 1;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+/* Featured Events Section - Improved Opacity */
+.bg-light {
+    background-color: rgba(248, 249, 250, 0.95) !important;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+/* Specific style for the featured events section */
+section.py-5.bg-light {
+    background-color: #f8f9fa !important;
+    position: relative;
+    z-index: 1;
+}
+
+section.py-5.bg-light::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(46, 196, 182, 0.05) 100%);
+    z-index: -1;
+}
+
+/* Card Opacity Improvements */
+.card {
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    background-color: rgba(255, 255, 255, 1) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Event Card Specific Improvements */
+.event-card {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.event-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.event-card .card-img-top {
+    opacity: 1 !important;
+}
+
+.event-card .card-body {
+    background-color: #ffffff !important;
+}
+
+.event-card .card-title-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    padding: 20px 15px 10px;
+}
+
+/* Footer Opacity */
+footer.bg-dark {
+    background-color: rgba(33, 37, 41, 0.95) !important;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+/* Buttons with Improved Opacity */
+.btn-primary {
+    background-color: rgba(67, 97, 238, 0.9);
+    border-color: rgba(67, 97, 238, 0.9);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.btn-primary:hover {
+    background-color: rgba(58, 86, 212, 1);
+    border-color: rgba(58, 86, 212, 1);
+}
+
+.btn-outline-light {
+    border-color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 1.5rem;
+    }
+
+    .cta-section .container {
+        padding: 2rem 1rem;
+    }
+}

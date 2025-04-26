@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{% if category %}Edit{% else %}Create{% endif %} Category - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 2rem;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .form-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: var(--primary-color);
+    }
+
+    .sub-event-info {
+        background-color: rgba(67, 97, 238, 0.05);
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .price-input {
+        position: relative;
+    }
+
+    .price-input::before {
+        content: '₹';
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 10;
+    }
+
+    .price-input input {
+        padding-left: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container" data-aos="fade-up">
+                <div class="form-header">
+                    <h1>{% if category %}Edit{% else %}Create{% endif %} Category</h1>
+                    <p class="text-muted">{% if category %}Update your category details{% else %}Add a new category to your sub-event{% endif %}</p>
+                </div>
+
+                {% if sub_event %}
+                <div class="sub-event-info">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-layer-group fa-2x"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ sub_event.name }}</h5>
+                            <p class="mb-0 text-muted small">Adding category to this sub-event</p>
+                            <p class="mb-0 text-muted small">Event: {{ sub_event.event.name }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+
+                    <div class="mb-4 price-input">
+                        {{ form.price|as_crispy_field }}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'event_detail' sub_event.event.slug %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> {% if category %}Update{% else %}Create{% endif %} Category
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

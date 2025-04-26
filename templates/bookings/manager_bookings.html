@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Bookings - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-filters {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .booking-table {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .booking-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .booking-row {
+        transition: all 0.3s ease;
+    }
+
+    .booking-row:hover {
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .booking-row.pending {
+        border-left: 3px solid var(--warning-color);
+    }
+
+    .booking-row.approved {
+        border-left: 3px solid var(--success-color);
+    }
+
+    .booking-row.rejected {
+        border-left: 3px solid var(--danger-color);
+    }
+
+    .booking-row.cancelled {
+        border-left: 3px solid var(--secondary-color);
+    }
+
+    .booking-row.completed {
+        border-left: 3px solid var(--info-color);
+    }
+
+    .booking-id {
+        font-family: monospace;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+
+    .booking-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .pagination {
+        margin-top: 2rem;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .pagination .page-link {
+        color: var(--primary-color);
+    }
+
+    .empty-bookings {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-bookings-icon {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+
+    .stats-card {
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+        border-top: 4px solid var(--primary-color);
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+
+    .stats-card.pending {
+        border-top-color: var(--warning-color);
+    }
+
+    .stats-card.approved {
+        border-top-color: var(--success-color);
+    }
+
+    .stats-card.rejected {
+        border-top-color: var(--danger-color);
+    }
+
+    .stats-card.revenue {
+        border-top-color: var(--info-color);
+    }
+
+    .stats-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-0">Manage Bookings</h1>
+            <p class="text-muted">View and manage all bookings for your events</p>
+        </div>
+        <div>
+            <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+            <a href="{% url 'manager_events' %}" class="btn btn-outline-primary">
+                <i class="fas fa-calendar-alt me-2"></i> My Events
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stats-card text-center" data-aos="fade-up" data-aos-delay="100">
+                <div class="stats-icon text-primary">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stats-value">{{ total_bookings }}</div>
+                <div class="stats-label text-muted">Total Bookings</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card pending text-center" data-aos="fade-up" data-aos-delay="200">
+                <div class="stats-icon text-warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-value">{{ pending_bookings }}</div>
+                <div class="stats-label text-muted">Pending Bookings</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card approved text-center" data-aos="fade-up" data-aos-delay="300">
+                <div class="stats-icon text-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-value">{{ approved_bookings }}</div>
+                <div class="stats-label text-muted">Approved Bookings</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card revenue text-center" data-aos="fade-up" data-aos-delay="400">
+                <div class="stats-icon text-info">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="stats-value">₹{{ total_revenue }}</div>
+                <div class="stats-label text-muted">Total Revenue</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="booking-filters" data-aos="fade-up">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="event" class="form-label">Event</label>
+                <select class="form-select" id="event" name="event">
+                    <option value="">All Events</option>
+                    {% for event in events %}
+                        <option value="{{ event.id }}" {% if request.GET.event == event.id|stringformat:"i" %}selected{% endif %}>{{ event.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">All Statuses</option>
+                    {% for status_code, status_label in status_choices %}
+                        <option value="{{ status_code }}" {% if request.GET.status == status_code %}selected{% endif %}>{{ status_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date_from" class="form-label">Date From</label>
+                <input type="date" class="form-control" id="date_from" name="date_from" value="{{ request.GET.date_from }}">
+            </div>
+            <div class="col-md-3">
+                <label for="date_to" class="form-label">Date To</label>
+                <input type="date" class="form-control" id="date_to" name="date_to" value="{{ request.GET.date_to }}">
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-2"></i> Filter
+                </button>
+                <a href="{% url 'manager_bookings' %}" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-redo me-2"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    {% if bookings %}
+        <div class="booking-table" data-aos="fade-up">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Customer</th>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Guests</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                            <tr class="booking-row {{ booking.status }}">
+                                <td><span class="booking-id">#{{ booking.booking_id|truncatechars:8 }}</span></td>
+                                <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
+                                <td>{{ booking.event.name }}</td>
+                                <td>{{ booking.booking_date }}</td>
+                                <td>{{ booking.guest_count }}</td>
+                                <td>
+                                    {% if booking.status == 'pending' %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% elif booking.status == 'approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif booking.status == 'rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% elif booking.status == 'cancelled' %}
+                                        <span class="badge bg-secondary">Cancelled</span>
+                                    {% elif booking.status == 'completed' %}
+                                        <span class="badge bg-info">Completed</span>
+                                    {% endif %}
+                                </td>
+                                <td>₹{{ booking.final_price }}</td>
+                                <td>
+                                    <div class="booking-actions">
+                                        <a href="{% url 'manager_booking_detail' booking.booking_id %}" class="btn btn-sm btn-outline-primary" title="View Booking Details">
+                                            <i class="fas fa-eye"></i><span class="visually-hidden">View</span>
+                                        </a>
+                                        {% if booking.status == 'pending' %}
+                                            <a href="{% url 'approve_booking' booking.booking_id %}" class="btn btn-sm btn-outline-success" title="Approve Booking">
+                                                <i class="fas fa-check"></i><span class="visually-hidden">Approve</span>
+                                            </a>
+                                            <a href="{% url 'reject_booking' booking.booking_id %}" class="btn btn-sm btn-outline-danger" title="Reject Booking">
+                                                <i class="fas fa-times"></i><span class="visually-hidden">Reject</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if bookings.has_other_pages %}
+            <nav aria-label="Bookings pagination">
+                <ul class="pagination justify-content-center">{% if bookings.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ bookings.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>{% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="First">
+                                <span aria-hidden="true">&laquo;&laquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>{% endif %}{% for i in bookings.paginator.page_range %}{% if bookings.number == i %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>{% elif i > bookings.number|add:'-3' and i < bookings.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>{% endif %}{% endfor %}{% if bookings.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ bookings.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ bookings.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>{% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Last">
+                                <span aria-hidden="true">&raquo;&raquo;</span>
+                            </a>
+                        </li>{% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="card shadow" data-aos="fade-up">
+            <div class="card-body empty-bookings">
+                <div class="empty-bookings-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h4>No Bookings Found</h4>
+                <p class="text-muted mb-4">There are no bookings matching your filters.</p>
+                <a href="{% url 'manager_bookings' %}" class="btn btn-primary">
+                    <i class="fas fa-redo me-2"></i> Reset Filters
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

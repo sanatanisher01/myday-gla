@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ event.name }} Gallery - MyDay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .gallery-header {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    .gallery-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%);
+        z-index: 1;
+    }
+    
+    .gallery-header-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .gallery-item {
+        position: relative;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+    
+    .gallery-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .gallery-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+        color: white;
+    }
+    
+    .gallery-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-item:hover .gallery-actions {
+        opacity: 1;
+    }
+    
+    .gallery-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-left: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-action:hover {
+        transform: scale(1.1);
+    }
+    
+    .empty-gallery {
+        text-align: center;
+        padding: 3rem;
+    }
+    
+    .empty-gallery-icon {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Gallery Header -->
+<div class="gallery-header" style="background-image: url('{{ event.cover_photo.url }}');">
+    <div class="container gallery-header-content">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">{{ event.name }} Gallery</h1>
+                <p class="lead mb-0">Manage your event gallery images</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                <a href="{% url 'add_event_image' event.slug %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i> Add Image
+                </a>
+                <a href="{% url 'event_detail' event.slug %}" class="btn btn-light ms-2">
+                    <i class="fas fa-eye me-2"></i> View Event
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    {% if gallery_images %}
+        <div class="row" data-aos="fade-up">
+            {% for image in gallery_images %}
+                <div class="col-md-4">
+                    <div class="gallery-item">
+                        <img src="{{ image.image.url }}" alt="{{ image.caption }}" class="gallery-image">
+                        {% if image.caption %}
+                            <div class="gallery-caption">
+                                <p class="mb-0">{{ image.caption }}</p>
+                            </div>
+                        {% endif %}
+                        <div class="gallery-actions d-flex">
+                            <a href="{{ image.image.url }}" class="gallery-action text-primary" target="_blank" title="View Full Size">
+                                <i class="fas fa-search-plus"></i>
+                            </a>
+                            <a href="{% url 'delete_event_image' image.id %}" class="gallery-action text-danger" title="Delete Image">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card shadow" data-aos="fade-up">
+            <div class="card-body empty-gallery">
+                <div class="empty-gallery-icon">
+                    <i class="fas fa-images"></i>
+                </div>
+                <h4>No Images in Gallery</h4>
+                <p class="text-muted mb-4">Add images to showcase your event to potential customers.</p>
+                <a href="{% url 'add_event_image' event.slug %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i> Add Your First Image
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'emails/base_email.html' %}
+
+{% block title %}Welcome to MyDay!{% endblock %}
+
+{% block header_title %}Welcome to MyDay!{% endblock %}
+
+{% block content %}
+<p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+<p>Welcome to MyDay! We're thrilled to have you join our platform for event booking and management.</p>
+
+<p>With MyDay, you can:</p>
+
+<ul style="padding-left: 20px;">
+    <li>Browse and book a variety of events</li>
+    <li>Customize your events with different options</li>
+    <li>Chat directly with event managers</li>
+    <li>Track your bookings in real-time</li>
+    <li>Receive special discounts and offers</li>
+</ul>
+
+<div class="text-center">
+    <a href="{{ site_url }}{% url 'event_list' %}" class="btn">Explore Events</a>
+</div>
+
+<p>To get started, we recommend completing your profile with your contact information. This will make the booking process smoother and faster.</p>
+
+<div class="text-center">
+    <a href="{{ site_url }}{% url 'edit_profile' %}" class="btn" style="background-color: #2ec4b6;">Complete Your Profile</a>
+</div>
+
+<p>If you have any questions or need assistance, our support team is always ready to help.</p>
+
+<p>Thank you for choosing MyDay for your event needs!</p>
+
+<p>Best regards,<br>The MyDay Team</p>
+{% endblock %}

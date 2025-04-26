@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Approve Booking - MyDay{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Approve Booking</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-0"><i class="fas fa-info-circle me-2"></i> You are about to approve the booking for <strong>{{ booking.event.name }}</strong>.</p>
+                    </div>
+                    
+                    <div class="booking-details mb-4">
+                        <h5>Booking Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-user me-2 text-primary"></i> Customer</span>
+                                <span>{{ booking.user.get_full_name|default:booking.user.username }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-calendar-alt me-2 text-primary"></i> Booking Date</span>
+                                <span>{{ booking.booking_date|date:"F d, Y" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-users me-2 text-primary"></i> Guest Count</span>
+                                <span>{{ booking.guest_count }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-rupee-sign me-2 text-primary"></i> Total Price</span>
+                                <span>₹{{ booking.total_price }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-rupee-sign me-2 text-primary"></i> Final Price</span>
+                                <span>₹{{ booking.final_price }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-clock me-2 text-primary"></i> Created On</span>
+                                <span>{{ booking.created_at|date:"F d, Y" }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="sub-events mb-4">
+                        <h5>Selected Sub-events</h5>
+                        <div class="list-group">
+                            {% for sub_event_booking in booking.sub_event_bookings.all %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-1">{{ sub_event_booking.sub_event.name }}</h6>
+                                        <span class="text-primary">₹{{ sub_event_booking.sub_event.price }}</span>
+                                    </div>
+                                    
+                                    {% if sub_event_booking.category_bookings.exists %}
+                                        <div class="mt-2">
+                                            <p class="mb-1 text-muted small">Selected Categories:</p>
+                                            <ul class="list-unstyled ms-3">
+                                                {% for category_booking in sub_event_booking.category_bookings.all %}
+                                                    <li class="d-flex justify-content-between">
+                                                        <span>{{ category_booking.category.name }}</span>
+                                                        <span class="text-primary">₹{{ category_booking.category.price }}</span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'manager_booking_detail' booking.booking_id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i> Approve Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
