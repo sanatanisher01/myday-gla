@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
 
 # Load environment variables from .env file if it exists
 try:
@@ -110,45 +109,14 @@ WSGI_APPLICATION = 'myday.wsgi.application'
 # Database configuration
 import sys
 
-# Check if running on Render (production)
-IS_RENDER = os.environ.get('RENDER', '') == 'true'
-
-# Print debug information
-print(f"Running on Render: {IS_RENDER}", file=sys.stderr)
-print(f"DEBUG mode: {DEBUG}", file=sys.stderr)
-
-if IS_RENDER:
-    # Production database (PostgreSQL on Render)
-    DATABASE_URL = os.environ.get('DATABASE_URL', '')
-    print(f"DATABASE_URL: {DATABASE_URL}", file=sys.stderr)
-
-    if DATABASE_URL:
-        print("Using PostgreSQL database from DATABASE_URL", file=sys.stderr)
-        DATABASES = {
-            'default': dj_database_url.config(
-                default=DATABASE_URL,
-                conn_max_age=600,
-                conn_health_checks=True,
-            )
-        }
-    else:
-        # Use SQLite as fallback even in production when DATABASE_URL is not set
-        print("DATABASE_URL not found, using SQLite as fallback", file=sys.stderr)
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
-else:
-    # Local development - use SQLite
-    print("Using SQLite database for local development", file=sys.stderr)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# Database configuration
+print("Using SQLite database for local development", file=sys.stderr)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
 
 
 # Password validation

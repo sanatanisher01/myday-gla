@@ -72,41 +72,18 @@ python manage.py runserver
 
 8. Visit `http://127.0.0.1:8000/` in your browser.
 
-### Deployment on Railway
+### Deployment
 
-This project is configured for deployment on Railway. The deployment is automated using the `railway.json` configuration file.
+To deploy this application to a production environment, you'll need to:
 
-#### Prerequisites
+1. Set up a web server (e.g., Nginx, Apache)
+2. Configure a WSGI server (e.g., Gunicorn, uWSGI)
+3. Set up a production database (e.g., PostgreSQL, MySQL)
+4. Configure environment variables for production settings
+5. Set up static file serving
+6. Configure SSL/TLS for secure connections
 
-1. A Railway account
-2. A Cloudinary account for media storage
-3. (Optional) An email service account for sending emails
-
-#### Deployment Steps
-
-1. Fork or clone this repository to your GitHub account
-2. Create a new project on Railway
-3. Connect your GitHub repository to Railway
-4. Add a PostgreSQL database to your project
-5. Configure the environment variables in the Railway dashboard:
-   - `DJANGO_SECRET_KEY`: A secure random key for Django
-   - `DJANGO_DEBUG`: Set to False for production
-   - `RAILWAY_ENVIRONMENT`: Set to production
-   - `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
-   - `CLOUDINARY_API_KEY`: Your Cloudinary API key
-   - `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
-   - `EMAIL_HOST_USER`: Your email address for sending emails
-   - `EMAIL_HOST_PASSWORD`: Your email password or app password
-
-#### Manual Deployment
-
-If you prefer to set up the deployment manually:
-
-1. Create a new service on Railway
-2. Connect your GitHub repository
-3. Railway will automatically detect the `Procfile` and deploy your application
-4. Add the environment variables listed above
-5. Create a PostgreSQL database and link it to your service
+Detailed deployment instructions will depend on your hosting provider and preferences.
 
 ## Email Functionality
 
@@ -154,12 +131,9 @@ python manage.py send_event_reminders --days=1
 - Django: Web framework
 - Bootstrap: Frontend framework
 - Cloudinary: Image storage
-- PostgreSQL: Database (in production)
-- SQLite: Database (in development)
+- SQLite: Database
 - SMTP: Email sending
-- Gunicorn: WSGI HTTP Server
 - WhiteNoise: Static file serving
-- Railway: Cloud hosting platform
 
 ## License
 
