@@ -107,14 +107,7 @@ WSGI_APPLICATION = 'myday.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # Use SQLite locally and PostgreSQL on Render
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-else:
+if os.environ.get('DATABASE_URL'):
     # Parse database configuration from $DATABASE_URL
     DATABASES = {
         'default': dj_database_url.config(
@@ -122,6 +115,14 @@ else:
             conn_max_age=600,
             conn_health_checks=True,
         )
+    }
+else:
+    # Use SQLite as fallback
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
 
 
