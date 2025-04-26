@@ -156,9 +156,9 @@ class Command(BaseCommand):
 
                         cursor.execute("""
                             INSERT INTO events_event
-                            (name, description, created_at, updated_at, created_by_id, slug)
+                            (name, description, created_at, updated_at, created_by_id, slug, cover_photo)
                             VALUES
-                            ('Sample Event', 'This is a sample event created during initialization', %s, %s, %s, 'sample-event')
+                            ('Sample Event', 'This is a sample event created during initialization', %s, %s, %s, 'sample-event', '')
                             RETURNING id
                         """, [now, now, admin_id])
 
