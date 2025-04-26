@@ -57,6 +57,63 @@ except Exception as e:
         fi
     done
 
+    # Reset the database completely
+    echo "Resetting database schema..."
+    python -c "
+import sys
+import psycopg2
+from urllib.parse import urlparse
+import os
+
+# Parse the DATABASE_URL
+url = urlparse(os.environ.get('DATABASE_URL'))
+dbname = url.path[1:]
+user = url.username
+password = url.password
+host = url.hostname
+port = url.port
+
+try:
+    # Connect to the database
+    conn = psycopg2.connect(
+        dbname=dbname,
+        user=user,
+        password=password,
+        host=host,
+        port=port
+    )
+    conn.autocommit = True
+    cursor = conn.cursor()
+
+    # Get a list of all tables
+    cursor.execute(\"\"\"
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+        AND table_type = 'BASE TABLE'
+    \"\"\")
+    tables = [row[0] for row in cursor.fetchall()]
+
+    # Drop all tables
+    if tables:
+        # Disable foreign key checks
+        cursor.execute('SET CONSTRAINTS ALL DEFERRED;')
+
+        for table in tables:
+            print(f'Dropping table {table}...')
+            cursor.execute(f'DROP TABLE IF EXISTS {table} CASCADE;')
+
+        # Re-enable foreign key checks
+        cursor.execute('SET CONSTRAINTS ALL IMMEDIATE;')
+
+    print('All tables dropped successfully')
+    conn.close()
+
+except Exception as e:
+    print(f'Error resetting database: {e}')
+    sys.exit(1)
+"
+
     # Try to run migrations
     echo "Running migrations..."
     python manage.py migrate --noinput || {

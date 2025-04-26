@@ -6,7 +6,7 @@ class Event(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
-    cover_photo = models.ImageField(upload_to='event_covers/')
+    cover_photo = models.ImageField(upload_to='event_covers/', blank=True, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_events')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
