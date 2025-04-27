@@ -14,7 +14,7 @@
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <h5 class="mb-3">Account Information</h5>
@@ -25,10 +25,10 @@
                                 {{ p_form|crispy }}
                             </div>
                         </div>
-                        
+
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <a href="{% url 'profile' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
                         </div>
                     </form>
                 </div>
