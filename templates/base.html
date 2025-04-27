@@ -67,7 +67,7 @@
                         <a class="nav-link" href="{% url 'home' %}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'event_list' %}">Events</a>
+                        <a class="nav-link" href="{% url 'events:event_list' %}">Events</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
@@ -168,7 +168,7 @@
                         <h5 class="footer-heading">Quick Links</h5>
                         <ul class="list-unstyled footer-links">
                             <li><a href="{% url 'home' %}">Home</a></li>
-                            <li><a href="{% url 'event_list' %}">Events</a></li>
+                            <li><a href="{% url 'events:event_list' %}">Events</a></li>
                             <li><a href="{% url 'login' %}">Login</a></li>
                             <li><a href="{% url 'register' %}">Register</a></li>
                         </ul>

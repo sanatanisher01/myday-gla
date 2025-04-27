@@ -21,6 +21,13 @@ if [ ! -f "staticfiles/favicon.ico" ]; then
     touch staticfiles/favicon.ico
 fi
 
+# Create a simple robots.txt file if it doesn't exist
+if [ ! -f "staticfiles/robots.txt" ]; then
+    echo "Creating a simple robots.txt file..."
+    echo "User-agent: *" > staticfiles/robots.txt
+    echo "Allow: /" >> staticfiles/robots.txt
+fi
+
 # Database setup
 echo "Setting up database..."
 

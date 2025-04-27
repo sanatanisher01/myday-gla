@@ -92,7 +92,7 @@
             <p class="text-muted">Welcome back, {{ request.user.first_name|default:request.user.username }}! Here's an overview of your bookings.</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="{% url 'event_list' %}" class="btn btn-primary">
+            <a href="{% url 'events:event_list' %}" class="btn btn-primary">
                 <i class="fas fa-calendar-plus me-2"></i> Book New Event
             </a>
         </div>
@@ -110,7 +110,7 @@
                         <a href="{% url 'edit_profile' %}" class="list-group-item list-group-item-action">
                             <i class="fas fa-edit me-2"></i> Edit Profile
                         </a>
-                        <a href="{% url 'event_list' %}" class="list-group-item list-group-item-action">
+                        <a href="{% url 'events:event_list' %}" class="list-group-item list-group-item-action">
                             <i class="fas fa-calendar me-2"></i> Browse Events
                         </a>
                         <a href="{% url 'chat_home' %}" class="list-group-item list-group-item-action">
