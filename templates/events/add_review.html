@@ -12,12 +12,12 @@
         box-shadow: var(--card-shadow);
         padding: 2rem;
     }
-    
+
     .form-header {
         margin-bottom: 2rem;
         position: relative;
     }
-    
+
     .form-header::after {
         content: '';
         position: absolute;
@@ -27,7 +27,7 @@
         height: 3px;
         background-color: var(--primary-color);
     }
-    
+
     .event-info {
         background-color: rgba(67, 97, 238, 0.05);
         border-radius: var(--border-radius);
@@ -35,24 +35,24 @@
         margin-bottom: 2rem;
         border-left: 4px solid var(--primary-color);
     }
-    
+
     .star-rating {
         display: flex;
         flex-direction: row-reverse;
         justify-content: flex-end;
     }
-    
+
     .star-rating input {
         display: none;
     }
-    
+
     .star-rating label {
         cursor: pointer;
         font-size: 2rem;
         color: #ddd;
         margin-right: 0.25rem;
     }
-    
+
     .star-rating label:hover,
     .star-rating label:hover ~ label,
     .star-rating input:checked ~ label {
@@ -70,7 +70,7 @@
                     <h1>{% if existing_review %}Edit{% else %}Add{% endif %} Review</h1>
                     <p class="text-muted">Share your experience with this event</p>
                 </div>
-                
+
                 {% if event %}
                 <div class="event-info">
                     <div class="d-flex align-items-center">
@@ -84,25 +84,25 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 <form method="POST">
                     {% csrf_token %}
-                    
+
                     <div class="mb-4">
                         <label for="id_rating" class="form-label">Rating</label>
                         <div class="star-rating">
                             <input type="radio" id="star5" name="rating" value="5" {% if form.instance.rating == 5 %}checked{% endif %} />
                             <label for="star5" title="5 stars"><i class="fas fa-star"></i></label>
-                            
+
                             <input type="radio" id="star4" name="rating" value="4" {% if form.instance.rating == 4 %}checked{% endif %} />
                             <label for="star4" title="4 stars"><i class="fas fa-star"></i></label>
-                            
+
                             <input type="radio" id="star3" name="rating" value="3" {% if form.instance.rating == 3 %}checked{% endif %} />
                             <label for="star3" title="3 stars"><i class="fas fa-star"></i></label>
-                            
+
                             <input type="radio" id="star2" name="rating" value="2" {% if form.instance.rating == 2 %}checked{% endif %} />
                             <label for="star2" title="2 stars"><i class="fas fa-star"></i></label>
-                            
+
                             <input type="radio" id="star1" name="rating" value="1" {% if form.instance.rating == 1 %}checked{% endif %} />
                             <label for="star1" title="1 star"><i class="fas fa-star"></i></label>
                         </div>
@@ -112,13 +112,13 @@
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="mb-4">
                         {{ form.comment|as_crispy_field }}
                     </div>
-                    
+
                     <div class="d-flex justify-content-between">
-                        <a href="{% url 'event_detail' event.slug %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i> Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
