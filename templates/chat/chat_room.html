@@ -625,8 +625,8 @@
         messageForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Don't submit empty messages
-            if (!messageInput.value.trim() && !currentFile) {
+            // Don't submit if both message and file are empty
+            if (!messageInput.value.trim() && !currentFile && !fileUrl.value) {
                 return;
             }
 

@@ -60,11 +60,12 @@ def chat_room(request, user_id):
 
     # Handle message submission
     if request.method == 'POST':
-        message_text = request.POST.get('message')
+        message_text = request.POST.get('message', '').strip()
         message_type = request.POST.get('message_type', 'text')
         file_url = request.POST.get('file_url', '')
 
-        if message_text:
+        # Allow empty message text for image/video messages
+        if message_text or file_url:
             # Create the message
             ChatMessage.objects.create(
                 sender=request.user,
