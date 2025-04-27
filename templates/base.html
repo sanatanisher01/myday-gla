@@ -54,7 +54,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class="navbar-brand" href="{% url 'events:home' %}">
                 <!-- Use text instead of image to avoid static file issues -->
                 <span class="fw-bold fs-4">MyDay</span>
             </a>
@@ -64,14 +64,14 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                        <a class="nav-link" href="{% url 'events:home' %}">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events:event_list' %}">Events</a>
                     </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'my_bookings' %}">My Bookings</a>
+                            <a class="nav-link" href="{% url 'bookings:my_bookings' %}">My Bookings</a>
                         </li>
                         {% if user.profile.is_manager %}
                             <li class="nav-item dropdown">
@@ -81,8 +81,8 @@
                                 <ul class="dropdown-menu dropdown-menu-animated">
                                     <li><a class="dropdown-item" href="{% url 'events:manager_dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{% url 'events:manager_events' %}"><i class="fas fa-calendar-alt me-2"></i>My Events</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'manager_bookings' %}"><i class="fas fa-calendar-check me-2"></i>Bookings</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'discount_list' %}"><i class="fas fa-tags me-2"></i>Discounts</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'bookings:manager_bookings' %}"><i class="fas fa-calendar-check me-2"></i>Bookings</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'bookings:discount_list' %}"><i class="fas fa-tags me-2"></i>Discounts</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><a class="dropdown-item" href="{% url 'events:create_event' %}"><i class="fas fa-plus me-2"></i>Create Event</a></li>
                                 </ul>
@@ -93,7 +93,7 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'chat_home' %}">
+                            <a class="nav-link" href="{% url 'chat:chat_home' %}">
                                 <i class="fas fa-comments"></i> Chat
                             </a>
                         </li>
@@ -107,20 +107,20 @@
                                 {{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-animated">
-                                <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'my_bookings' %}"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
-                                <li><a class="dropdown-item" href="{% url 'chat_home' %}"><i class="fas fa-comments me-2"></i>Messages</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'bookings:my_bookings' %}"><i class="fas fa-calendar-check me-2"></i>My Bookings</a></li>
+                                <li><a class="dropdown-item" href="{% url 'chat:chat_home' %}"><i class="fas fa-comments me-2"></i>Messages</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link btn btn-outline-light btn-sm px-3 me-2" href="{% url 'login' %}">Login</a>
+                            <a class="nav-link btn btn-outline-light btn-sm px-3 me-2" href="{% url 'accounts:login' %}">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary btn-sm px-3" href="{% url 'register' %}">Register</a>
+                            <a class="nav-link btn btn-primary btn-sm px-3" href="{% url 'accounts:register' %}">Register</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -167,10 +167,10 @@
                     <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                         <h5 class="footer-heading">Quick Links</h5>
                         <ul class="list-unstyled footer-links">
-                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'events:home' %}">Home</a></li>
                             <li><a href="{% url 'events:event_list' %}">Events</a></li>
-                            <li><a href="{% url 'login' %}">Login</a></li>
-                            <li><a href="{% url 'register' %}">Register</a></li>
+                            <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                            <li><a href="{% url 'accounts:register' %}">Register</a></li>
                         </ul>
                     </div>
 
