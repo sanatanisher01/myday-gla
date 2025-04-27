@@ -11,15 +11,19 @@ from .settings import *
 DEBUG = False
 
 # Allow all host headers
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.onrender.com,localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*.onrender.com,.onrender.com,myday-gla-dsuw.onrender.com,localhost,127.0.0.1').split(',')
 
 # Add CSRF trusted origins for Render
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://myday-gla-dsuw.onrender.com',
+]
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     'https://myday.onrender.com',
+    'https://myday-gla-dsuw.onrender.com',
 ]
 CORS_ALLOW_METHODS = [
     'GET',
