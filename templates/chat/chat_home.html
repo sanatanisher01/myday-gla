@@ -115,6 +115,12 @@
         align-items: center;
         justify-content: center;
     }
+
+    .badge.bg-danger {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        animation: pulse 1.5s infinite;
+    }
 </style>
 {% endblock %}
 
@@ -184,6 +190,9 @@
                     {% else %}
                         <div class="p-4 text-center text-muted">
                             <p>No conversations yet</p>
+                            {% if not user.profile.is_manager %}
+                            <p><small>You can only chat with event managers</small></p>
+                            {% endif %}
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                                 Start a conversation
                             </button>
@@ -200,7 +209,12 @@
                         <i class="fas fa-comments"></i>
                     </div>
                     <h4>No Conversation Selected</h4>
-                    <p class="text-muted mb-4">Select a conversation from the sidebar or start a new one.</p>
+                    <p class="text-muted mb-4">
+                        Select a conversation from the sidebar or start a new one.
+                        {% if not user.profile.is_manager %}
+                        <br><strong>Note:</strong> You can only chat with event managers.
+                        {% endif %}
+                    </p>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                         <i class="fas fa-plus me-2"></i> Start New Conversation
                     </button>
@@ -216,6 +230,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="newConversationModalLabel">Start a New Conversation</h5>
+                {% if not user.profile.is_manager %}
+                <small class="text-muted">You can only chat with event managers</small>
+                {% endif %}
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -242,7 +259,11 @@
                         {% endfor %}
                     {% else %}
                         <div class="text-center p-4">
+                            {% if not user.profile.is_manager %}
+                            <p class="text-muted">No available managers to chat with at the moment.</p>
+                            {% else %}
                             <p class="text-muted">No available users to start a conversation with.</p>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

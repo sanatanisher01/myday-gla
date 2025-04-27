@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.dateformat import format
+from django.contrib import messages
 from .models import ChatMessage
 import cloudinary
 import cloudinary.uploader
@@ -45,9 +46,16 @@ def chat_home(request):
 
     # Get all users for the new conversation modal
     # Exclude the current user and users they already have conversations with
-    available_users = User.objects.exclude(
+    available_users_query = User.objects.exclude(
         id__in=[request.user.id] + [chat['user'].id for chat in chat_list]
     )
+
+    # If the current user is not a manager, only show managers in the available users list
+    if not request.user.profile.is_manager:
+        available_users = available_users_query.filter(profile__is_manager=True)
+    else:
+        # Managers can chat with anyone
+        available_users = available_users_query
 
     context = {
         'chat_list': chat_list,
@@ -60,6 +68,12 @@ def chat_home(request):
 def chat_room(request, user_id):
     # Get the other user
     other_user = get_object_or_404(User, id=user_id)
+
+    # Check if the current user is allowed to chat with the other user
+    # Regular users can only chat with managers
+    if not request.user.profile.is_manager and not other_user.profile.is_manager:
+        messages.error(request, 'You can only chat with event managers.')
+        return redirect('chat:chat_home')
 
     # Get all messages between these users
     messages = ChatMessage.objects.filter(
@@ -112,6 +126,12 @@ def chat_room(request, user_id):
 def create_chat(request, user_id):
     # Get the user to chat with
     other_user = get_object_or_404(User, id=user_id)
+
+    # Check if the current user is allowed to chat with the other user
+    # Regular users can only chat with managers
+    if not request.user.profile.is_manager and not other_user.profile.is_manager:
+        messages.error(request, 'You can only chat with event managers.')
+        return redirect('chat:chat_home')
 
     # Redirect to the chat room with this user
     return redirect('chat:chat_room', user_id=other_user.id)

@@ -132,7 +132,7 @@ def add_review(request, slug):
             review.user = request.user
             review.save()
             messages.success(request, 'Your review has been submitted!')
-            return redirect('event_detail', slug=slug)
+            return redirect('events:event_detail', slug=slug)
     else:
         form = ReviewForm(instance=existing_review)
 
