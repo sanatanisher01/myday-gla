@@ -45,12 +45,12 @@ def static_home_view(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('events/', include('events.urls')),
+    path('events/', include('events.urls')),  # events.urls has namespace 'events'
     path('bookings/', include('bookings.urls')),
     path('chat/', include('chat.urls')),
     path('maintenance/', maintenance_view, name='maintenance'),  # Direct maintenance page
     path('health/', health_check, name='health_check'),  # Health check endpoint for Render
-    path('', static_home_view, name='home'),  # Static home page for initial deployment
+    path('', views.home, name='home'),  # Use the regular home view instead of static
 ]
 
 # Serve media files in development

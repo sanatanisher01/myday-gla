@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from . import manager_views
 
+app_name = 'events'  # Add namespace to avoid URL conflicts
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('list/', views.event_list, name='event_list'),

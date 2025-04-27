@@ -41,7 +41,8 @@ def profile(request):
 def dashboard(request):
     # Redirect managers to manager dashboard
     if request.user.profile.is_manager:
-        return redirect('manager_dashboard')
+        # Redirect to the events manager dashboard instead of accounts manager dashboard
+        return redirect('events:manager_dashboard')
 
     # Get user's bookings
     user_bookings = Booking.objects.filter(user=request.user).order_by('-created_at')
@@ -82,70 +83,8 @@ def edit_profile(request):
 
 @login_required
 def manager_dashboard(request):
-    # Check if user is a manager
-    if not request.user.profile.is_manager:
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
-
-    # Get current date and time
-    now = timezone.now()
-
-    # Get all bookings
-    all_bookings = Booking.objects.all()
-
-    # Get bookings for the current month
-    current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    next_month_start = (current_month_start + timedelta(days=32)).replace(day=1)
-    current_month_bookings = all_bookings.filter(created_at__gte=current_month_start, created_at__lt=next_month_start)
-
-    # Get approved and pending bookings
-    approved_bookings = current_month_bookings.filter(status='approved')
-    pending_bookings = current_month_bookings.filter(status='pending')
-
-    # Calculate revenue
-    total_revenue = approved_bookings.aggregate(total=Sum('total_price'))['total'] or 0
-
-    # Get average rating
-    avg_rating = Review.objects.aggregate(avg=Avg('rating'))['avg'] or 0
-
-    # Get booking counts by month for the last 6 months
-    months_data = []
-    for i in range(5, -1, -1):
-        month_date = (now - timedelta(days=30*i)).replace(day=1)
-        month_name = month_date.strftime('%B')
-        month_start = month_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        if i > 0:
-            month_end = (month_date + timedelta(days=32)).replace(day=1)
-        else:
-            month_end = now
-
-        month_approved = all_bookings.filter(created_at__gte=month_start, created_at__lt=month_end, status='approved').count()
-        month_rejected = all_bookings.filter(created_at__gte=month_start, created_at__lt=month_end, status='rejected').count()
-
-        months_data.append({
-            'month': month_name,
-            'approved': month_approved,
-            'rejected': month_rejected
-        })
-
-    # Get top events by bookings
-    top_events = Event.objects.annotate(booking_count=Count('bookings')).order_by('-booking_count')[:5]
-
-    # Get recent bookings
-    recent_bookings = all_bookings.order_by('-created_at')[:10]
-
-    context = {
-        'total_bookings': all_bookings.count(),
-        'approved_bookings': all_bookings.filter(status='approved').count(),
-        'pending_bookings': all_bookings.filter(status='pending').count(),
-        'total_revenue': total_revenue,
-        'avg_rating': avg_rating,
-        'months_data': json.dumps(months_data),
-        'top_events': top_events,
-        'recent_bookings': recent_bookings,
-    }
-
-    return render(request, 'accounts/manager_dashboard.html', context)
+    # This view is deprecated - redirect to the events manager dashboard
+    return redirect('events:manager_dashboard')
 
 @login_required
 def booking_analytics(request):
@@ -153,8 +92,13 @@ def booking_analytics(request):
     if not request.user.profile.is_manager:
         return JsonResponse({'error': 'Permission denied'}, status=403)
 
-    # Get all bookings
-    bookings = Booking.objects.all()
+    try:
+        # Get all bookings
+        bookings = Booking.objects.all()
+    except Exception as e:
+        # Log the error and return a friendly error message
+        print(f"Error in booking_analytics: {e}")
+        return JsonResponse({'error': 'An error occurred while fetching booking data'}, status=500)
 
     # Get booking data by day of week
     weekday_data = [0] * 7  # Initialize counts for each day of the week

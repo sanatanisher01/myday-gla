@@ -15,11 +15,17 @@ def manager_dashboard(request):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('home')
 
-    # Get events created by this manager
-    events = Event.objects.filter(created_by=request.user)
+    try:
+        # Get events created by this manager
+        events = Event.objects.filter(created_by=request.user)
 
-    # Get bookings for these events
-    bookings = Booking.objects.filter(event__in=events)
+        # Get bookings for these events
+        bookings = Booking.objects.filter(event__in=events)
+    except Exception as e:
+        # Log the error and show a friendly message
+        print(f"Error in manager_dashboard: {e}")
+        messages.error(request, 'There was an error loading your dashboard. Please try again later.')
+        return redirect('home')
 
     # Calculate statistics
     total_events = events.count()
