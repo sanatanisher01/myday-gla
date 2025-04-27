@@ -94,7 +94,8 @@ class CustomPasswordResetView(PasswordResetView):
     Custom password reset view to use our custom email template
     """
     template_name = 'accounts/password_reset.html'
-    email_template_name = 'emails/password_reset.html'
+    email_template_name = 'emails/password_reset.txt'  # Plain text version
+    html_email_template_name = 'emails/password_reset.html'  # HTML version
     success_url = reverse_lazy('accounts:password_reset_done')
 
     def form_valid(self, form):
