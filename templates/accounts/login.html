@@ -22,13 +22,13 @@
                 </button>
             </form>
             <div class="text-center mt-4">
-                <a href="{% url 'password_reset' %}" class="forgot-password">
+                <a href="{% url 'accounts:password_reset' %}" class="forgot-password">
                     <i class="fas fa-key me-1"></i>Forgot Password?
                 </a>
             </div>
         </div>
         <div class="card-footer text-center">
-            <p class="mb-0">Don't have an account? <a href="{% url 'register' %}" class="fw-bold">Sign Up</a></p>
+            <p class="mb-0">Don't have an account? <a href="{% url 'accounts:register' %}" class="fw-bold">Sign Up</a></p>
         </div>
     </div>
 </div>
