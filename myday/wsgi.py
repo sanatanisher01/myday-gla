@@ -8,9 +8,16 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 """
 
 import os
+import sys
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings')
+# Check if we're running on Render
+if os.environ.get('RENDER', '').lower() == 'true':
+    print("Running on Render, using settings_render.py", file=sys.stderr)
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings_render')
+else:
+    print("Running locally, using settings.py", file=sys.stderr)
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings')
 
 application = get_wsgi_application()
