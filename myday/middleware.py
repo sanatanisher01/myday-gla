@@ -23,8 +23,10 @@ class DatabaseErrorMiddleware:
         # Skip database check for static files, health check, and maintenance page
         if (request.path.startswith('/static/') or
             request.path == '/maintenance/' or
-            request.path == '/health/' or
-            request.path == '/favicon.ico'):
+            request.path.startswith('/health') or
+            request.path == '/favicon.ico' or
+            request.method == 'HEAD' or
+            request.method == 'OPTIONS'):
             return self.get_response(request)
 
         # If we're using SQLite, we can proceed without checking connection

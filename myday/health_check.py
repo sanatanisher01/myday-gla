@@ -15,7 +15,12 @@ def health_check(request):
     """
     # If this is a HEAD request (like Render uses), return a simple 200 response
     if request.method == 'HEAD':
-        return HttpResponse(status=200)
+        response = HttpResponse(status=200)
+        # Add CORS headers
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+        response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+        return response
 
     status = {
         "status": "healthy",
