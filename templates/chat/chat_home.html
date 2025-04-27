@@ -83,15 +83,37 @@
     }
 
     .unread-badge {
-        background-color: #dc3545;
-        color: white;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
+        margin-left: 5px;
+    }
+
+    .unread-badge .badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        animation: pulse 1.5s infinite;
+    }
+
+    /* Animation for new messages */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    /* Manager styling */
+    .text-danger.fw-bold {
+        position: relative;
+    }
+
+    .chat-list-item {
+        position: relative;
+    }
+
+    .rounded-circle.bg-secondary {
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
     }
 </style>
 {% endblock %}
@@ -109,7 +131,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Conversations</h5>
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                         <i class="fas fa-plus"></i> New
                     </button>
                 </div>
@@ -127,13 +149,16 @@
                                     </div>
                                     <div class="chat-info">
                                         <div class="d-flex justify-content-between">
-                                            <div class="chat-name">{{ chat.user.get_full_name|default:chat.user.username }}</div>
+                                            <div class="chat-name {% if chat.is_manager %}text-danger fw-bold{% endif %}">
+                                                {{ chat.user.get_full_name|default:chat.user.username }}
+                                                {% if chat.is_manager %}<span class="badge bg-danger ms-1">Manager</span>{% endif %}
+                                            </div>
                                             {% if chat.latest_message %}
                                                 <div class="chat-time">{{ chat.timestamp|date:"g:i A" }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="d-flex justify-content-between">
-                                            <div class="chat-preview">
+                                            <div class="chat-preview {% if chat.unread_count > 0 %}fw-bold{% endif %}">
                                                 {% if chat.latest_message %}
                                                     {% if chat.latest_message.message_type == 'image' %}
                                                         <i class="fas fa-image"></i> Image
@@ -146,6 +171,11 @@
                                                     No messages yet
                                                 {% endif %}
                                             </div>
+                                            {% if chat.unread_count > 0 %}
+                                                <div class="unread-badge">
+                                                    <span class="badge rounded-pill bg-danger">{{ chat.unread_count }}</span>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -154,7 +184,7 @@
                     {% else %}
                         <div class="p-4 text-center text-muted">
                             <p>No conversations yet</p>
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                                 Start a conversation
                             </button>
                         </div>
@@ -171,7 +201,7 @@
                     </div>
                     <h4>No Conversation Selected</h4>
                     <p class="text-muted mb-4">Select a conversation from the sidebar or start a new one.</p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                         <i class="fas fa-plus me-2"></i> Start New Conversation
                     </button>
                 </div>
@@ -197,7 +227,7 @@
                                     {% if user.profile.profile_picture %}
                                         <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle" width="40">
                                     {% else %}
-                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center">
                                             {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                                         </div>
                                     {% endif %}

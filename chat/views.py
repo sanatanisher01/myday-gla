@@ -24,11 +24,20 @@ def chat_home(request):
             (Q(sender=partner) & Q(receiver=request.user))
         ).order_by('-timestamp').first()
 
+        # Count unread messages from this partner
+        unread_count = ChatMessage.objects.filter(
+            sender=partner,
+            receiver=request.user,
+            is_read=False
+        ).count()
+
         if latest_message:
             chat_list.append({
                 'user': partner,
                 'latest_message': latest_message,
-                'timestamp': latest_message.timestamp
+                'timestamp': latest_message.timestamp,
+                'unread_count': unread_count,
+                'is_manager': partner.profile.is_manager
             })
 
     # Sort by latest message timestamp
@@ -57,6 +66,13 @@ def chat_room(request, user_id):
         (Q(sender=request.user) & Q(receiver=other_user)) |
         (Q(sender=other_user) & Q(receiver=request.user))
     ).order_by('timestamp')
+
+    # Mark messages from other user as read
+    ChatMessage.objects.filter(
+        sender=other_user,
+        receiver=request.user,
+        is_read=False
+    ).update(is_read=True)
 
     # Handle message submission
     if request.method == 'POST':
@@ -169,13 +185,20 @@ def check_new_messages(request, user_id):
     # Format messages for JSON response
     messages_data = []
     for message in new_messages:
+        # Mark messages from other user as read
+        if message.sender != request.user and not message.is_read:
+            message.is_read = True
+            message.save()
+
         messages_data.append({
             'id': message.id,
             'message': message.message,
             'message_type': message.message_type,
             'file_url': message.file_url,
             'is_sender': message.sender == request.user,
-            'timestamp': format(message.timestamp, 'M d, g:i a')
+            'timestamp': format(message.timestamp, 'M d, g:i a'),
+            'is_read': message.is_read,
+            'is_manager': message.sender.profile.is_manager
         })
 
     return JsonResponse({'new_messages': messages_data})

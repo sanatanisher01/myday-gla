@@ -236,9 +236,12 @@
                             {% endif %}
                         </div>
                         <div>
-                            <h5 class="mb-0">{{ other_user.get_full_name|default:other_user.username }}</h5>
-                            <small class="text-muted">
-                                {% if other_user.profile.is_manager %}Manager{% else %}User{% endif %}
+                            <h5 class="mb-0 {% if other_user.profile.is_manager %}text-danger{% endif %}">
+                                {{ other_user.get_full_name|default:other_user.username }}
+                                {% if other_user.profile.is_manager %}<span class="badge bg-danger ms-1">Manager</span>{% endif %}
+                            </h5>
+                            <small class="{% if other_user.profile.is_manager %}text-danger{% else %}text-muted{% endif %}">
+                                {% if other_user.profile.is_manager %}Event Manager{% else %}User{% endif %}
                             </small>
                         </div>
                     </div>
@@ -476,8 +479,11 @@
             });
         }
 
-        // Check for new messages every 3 seconds
-        setInterval(checkForNewMessages, 3000);
+        // Check for new messages more frequently (every 1 second) for better real-time experience
+        setInterval(checkForNewMessages, 1000);
+
+        // Also check for new messages when the window gets focus
+        window.addEventListener('focus', checkForNewMessages);
 
         // Handle image modal
         const imageModal = document.getElementById('imageModal');
