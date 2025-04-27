@@ -100,13 +100,15 @@ def chat_room(request, user_id):
 
         # Allow empty message text for image/video messages
         if message_text or file_url:
-            # Create the message
+            # Create the message and mark it as read for the sender
+            # (sender has obviously read their own message)
             ChatMessage.objects.create(
                 sender=request.user,
                 receiver=other_user,
                 message=message_text,
                 message_type=message_type,
-                file_url=file_url
+                file_url=file_url,
+                is_read=True  # Mark as read by default for the sender
             )
 
             # If it's an AJAX request, return JSON response
@@ -146,7 +148,8 @@ def create_chat(request, user_id):
         ChatMessage.objects.create(
             sender=request.user,
             receiver=other_user,
-            message=welcome_message
+            message=welcome_message,
+            is_read=True  # Mark as read by default for the sender
         )
 
     # Redirect to the chat room with this user
@@ -215,11 +218,21 @@ def check_new_messages(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
 
     # Get new messages between these users
+    # We need to handle two cases:
+    # 1. Messages from the other user to the current user (these should be marked as read)
+    # 2. Messages from the current user to the other user (these should already be marked as read)
     new_messages = ChatMessage.objects.filter(
         (Q(sender=request.user) & Q(receiver=other_user)) |
         (Q(sender=other_user) & Q(receiver=request.user)),
         id__gt=last_id
     ).order_by('timestamp')
+
+    # Mark all messages from the current user as read (they should be read by default)
+    # This ensures that when a user logs back in, their own messages don't appear as unread
+    ChatMessage.objects.filter(
+        sender=request.user,
+        is_read=False
+    ).update(is_read=True)
 
     # Format messages for JSON response
     messages_data = []
