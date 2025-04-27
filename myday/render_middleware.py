@@ -58,47 +58,16 @@ class RenderWakeupMiddleware:
 
     def _warmup_application(self):
         """
-        Perform minimal warmup tasks to speed up application initialization.
-        This function does the bare minimum to get the app running quickly.
+        Perform warmup tasks to speed up application initialization.
         """
         try:
-            logger.info("Starting minimal application warmup")
+            logger.info("Starting application warmup")
 
-            # Import necessary modules here to preload them
-            from django.db import connection
+            # Simulate warmup tasks
+            time.sleep(2)
 
-            # Perform a simple database query to warm up the connection
-            # but don't wait for it to complete
-            def warm_db_async():
-                try:
-                    with connection.cursor() as cursor:
-                        cursor.execute("SELECT 1")
-                        cursor.fetchone()
-                    logger.info("Database connection warmed up")
-
-                    # Mark warmup as complete immediately after basic DB check
-                    self.is_waking_up = False
-                except Exception as db_error:
-                    logger.error(f"Database warmup error: {db_error}")
-                    # Even if there's an error, mark as not waking up so users can proceed
-                    self.is_waking_up = False
-
-            # Start database warmup in a separate thread
-            import threading
-            db_thread = threading.Thread(target=warm_db_async)
-            db_thread.daemon = True
-            db_thread.start()
-
-            # Don't wait for the thread to complete - let it run in background
-            # This allows users to see the site immediately
-
-            # Mark as not waking up after a very short time regardless
-            # This ensures users aren't stuck on the loading page
-            time.sleep(0.1)  # Very minimal delay
-
-            logger.info("Minimal application warmup complete")
-            # Note: The actual is_waking_up flag will be set to False by the background thread
-            # But we set it here as well as a fallback
+            # Mark warmup as complete
+            logger.info("Application warmup complete")
             self.is_waking_up = False
         except Exception as e:
             logger.error(f"Error during application warmup: {e}")

@@ -80,7 +80,7 @@
     <div class="loading-container">
         <img src="https://res.cloudinary.com/dqxdmayga/image/upload/v1711304834/myday-logo_ixnvxl.png" alt="MyDay Logo" class="logo">
         <h1>Starting MyDay</h1>
-        <p>Our application is waking up from sleep mode. This usually takes about 15 seconds on the first visit.</p>
+        <p>Our application is waking up from sleep mode. This usually takes about 30-60 seconds on the first visit.</p>
 
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
@@ -97,7 +97,7 @@
         let progressInterval;
         let healthCheckInterval;
         let progressValue = 0;
-        let maxWaitTime = 15000; // 15 seconds in milliseconds
+        let maxWaitTime = 120000; // 2 minutes in milliseconds
         let healthCheckUrl = '/health/';
         let statusMessages = [
             "Initializing application...",
@@ -169,7 +169,7 @@
                         console.log('Health check error:', error);
                         // Continue waiting, the error is expected while the app is starting
                     });
-            }, 1000); // Check every 1 second (even more frequent checks)
+            }, 5000); // Check every 5 seconds
         }
 
         // Initialize
