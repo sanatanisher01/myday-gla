@@ -108,6 +108,15 @@
                         <h4 class="mb-0">Price Summary</h4>
                     </div>
                     <div class="card-body">
+                        <!-- Price breakdown -->
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Sub-events:</span>
+                            <span id="sub-event-prices">₹0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Categories:</span>
+                            <span id="category-prices">₹0.00</span>
+                        </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Total Price:</span>
                             <span id="total-price">₹0.00</span>
@@ -206,13 +215,32 @@
             });
         });
 
-        // Update price when categories are selected
+        // Update price when categories are selected - with improved real-time updates
         const categoryCheckboxes = document.querySelectorAll('.category-checkbox input[type="checkbox"]');
         console.log('Found', categoryCheckboxes.length, 'category checkboxes');
         categoryCheckboxes.forEach(checkbox => {
             console.log('Category checkbox:', checkbox.id, 'Price:', checkbox.dataset.price);
+
+            // Add immediate visual feedback when category is selected/deselected
             checkbox.addEventListener('change', function() {
                 console.log('Category changed:', this.id, 'Price:', this.dataset.price, 'Checked:', this.checked);
+
+                // Highlight the category when selected
+                const categoryContainer = this.closest('.category-container');
+                if (categoryContainer) {
+                    if (this.checked) {
+                        categoryContainer.style.backgroundColor = '#f0f9ff';
+                        categoryContainer.style.borderLeft = '3px solid #4a6bdf';
+                        categoryContainer.style.padding = '5px';
+                        categoryContainer.style.borderRadius = '5px';
+                    } else {
+                        categoryContainer.style.backgroundColor = '';
+                        categoryContainer.style.borderLeft = '';
+                        categoryContainer.style.padding = '';
+                    }
+                }
+
+                // Update price immediately
                 updateTotalPrice();
             });
         });
@@ -292,31 +320,18 @@
             });
         }
 
-        // Update total price based on selections
+        // Update total price based on selections - improved real-time calculation
         function updateTotalPrice() {
-            // EMERGENCY FIX: Directly check for specific elements on the page
-            // This is a hardcoded solution to fix the immediate issue
-
-            // First, let's log all checkboxes to see what we're working with
-            console.log('All sub-event checkboxes:');
-            document.querySelectorAll('.sub-event-checkbox').forEach(cb => {
-                console.log(`- ID: ${cb.id}, Value: ${cb.value}, Checked: ${cb.checked}, Price: ${cb.dataset.price}`);
-            });
-
-            console.log('All category checkboxes:');
-            document.querySelectorAll('.category-checkbox input[type="checkbox"]').forEach(cb => {
-                console.log(`- ID: ${cb.id}, Value: ${cb.value}, Checked: ${cb.checked}, Price: ${cb.dataset.price}`);
-            });
-
-            // Now calculate the total price
+            // Calculate the total price
             let totalPrice = 0;
+            let subEventPrices = 0;
+            let categoryPrices = 0;
 
             // Add prices for selected sub-events
             document.querySelectorAll('.sub-event-checkbox:checked').forEach(subEvent => {
                 const price = parseFloat(subEvent.dataset.price);
                 if (!isNaN(price)) {
-                    console.log(`Adding sub-event price: ₹${price}`);
-                    totalPrice += price;
+                    subEventPrices += price;
                 }
             });
 
@@ -324,25 +339,27 @@
             document.querySelectorAll('.category-checkbox input[type="checkbox"]:checked').forEach(category => {
                 const price = parseFloat(category.dataset.price);
                 if (!isNaN(price)) {
-                    console.log(`Adding category price: ₹${price}`);
-                    totalPrice += price;
+                    categoryPrices += price;
                 }
             });
 
-            // HARDCODED FALLBACK: If the above doesn't work, try a direct approach
-            if (totalPrice === 0 || totalPrice === 2000) {
-                // Check if we have the Haldi and Photography checkboxes checked
-                const haldiChecked = document.querySelector('.sub-event-checkbox:checked') !== null;
-                const photographyChecked = document.querySelector('.category-checkbox input[type="checkbox"]:checked') !== null;
+            // Sum up the total
+            totalPrice = subEventPrices + categoryPrices;
 
-                console.log(`Fallback check - Haldi checked: ${haldiChecked}, Photography checked: ${photographyChecked}`);
+            // Update the price breakdown in the UI
+            const subEventPriceElement = document.getElementById('sub-event-prices');
+            const categoryPriceElement = document.getElementById('category-prices');
 
-                if (haldiChecked && photographyChecked) {
-                    console.log('Using fallback price calculation');
-                    totalPrice = 3000; // Haldi (2000) + Photography (1000)
-                }
+            // If we have price breakdown elements, update them
+            if (subEventPriceElement) {
+                subEventPriceElement.textContent = `₹${subEventPrices.toFixed(2)}`;
             }
 
+            if (categoryPriceElement) {
+                categoryPriceElement.textContent = `₹${categoryPrices.toFixed(2)}`;
+            }
+
+            console.log(`Price breakdown - Sub-events: ₹${subEventPrices.toFixed(2)}, Categories: ₹${categoryPrices.toFixed(2)}`);
             console.log(`Final calculated total price: ₹${totalPrice.toFixed(2)}`);
 
             // Apply discount if available

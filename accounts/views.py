@@ -68,8 +68,18 @@ def edit_profile(request):
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
 
         if u_form.is_valid() and p_form.is_valid():
-            u_form.save()
-            p_form.save()
+            # Save the forms
+            user = u_form.save()
+            profile = p_form.save()
+
+            # Update the session to reflect changes immediately
+            # This ensures the user doesn't need to log out and log back in
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, user)
+
+            # Force refresh of user object in the request
+            request.user = user
+
             messages.success(request, 'Your profile has been updated!')
             return redirect('accounts:profile')
     else:

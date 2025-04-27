@@ -24,13 +24,11 @@ class Event(models.Model):
         # Base price from sub-events
         base_price = sum(sub_event.price for sub_event in self.sub_events.all())
 
-        # Add minimum price for categories (assuming at least one category per sub-event if available)
+        # Add all category prices for a complete total
         category_price = 0
         for sub_event in self.sub_events.all():
-            if sub_event.categories.exists():
-                # Add the price of the cheapest category for each sub-event
-                min_category_price = min(category.price for category in sub_event.categories.all())
-                category_price += min_category_price
+            # Sum all category prices for each sub-event
+            category_price += sum(category.price for category in sub_event.categories.all())
 
         return base_price + category_price
 
