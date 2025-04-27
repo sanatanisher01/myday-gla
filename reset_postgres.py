@@ -45,12 +45,13 @@ def reset_postgres_database():
 
         # Get all tables in the public schema
         cursor.execute("""
-            SELECT table_name 
-            FROM information_schema.tables 
+            SELECT table_name
+            FROM information_schema.tables
             WHERE table_schema = 'public'
             AND table_type = 'BASE TABLE'
         """)
-        tables = cursor.fetchall()
+        # We don't need to store the tables, just drop the schema
+        cursor.fetchall()
 
         # Drop all tables
         print("Dropping all tables...")
@@ -67,12 +68,77 @@ def reset_postgres_database():
         print(f"Error resetting database: {e}")
         return False
 
+def ensure_tables_exist():
+    """Ensure that all required tables exist in the database."""
+    try:
+        # Set Django settings module
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'myday.settings_prod'
+
+        # Run migrations without --fake to create tables
+        print("Running migrations to create tables...")
+        result = os.system("python manage.py migrate --noinput")
+
+        if result != 0:
+            print("Migration failed, trying to create session table manually...")
+            # Connect to the database
+            from django.db import connection
+            cursor = connection.cursor()
+
+            # Check if django_session table exists
+            cursor.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables
+                    WHERE table_schema = 'public'
+                    AND table_name = 'django_session'
+                );
+            """)
+            session_table_exists = cursor.fetchone()[0]
+
+            if not session_table_exists:
+                print("Creating django_session table manually...")
+                cursor.execute("""
+                    CREATE TABLE django_session (
+                        session_key varchar(40) NOT NULL PRIMARY KEY,
+                        session_data text NOT NULL,
+                        expire_date timestamp with time zone NOT NULL
+                    );
+                    CREATE INDEX django_session_expire_date_idx ON django_session (expire_date);
+                """)
+                print("django_session table created successfully.")
+
+            # Check for other critical tables
+            tables_to_check = [
+                'auth_user',
+                'accounts_userprofile',
+                'events_event',
+                'bookings_booking'
+            ]
+
+            for table in tables_to_check:
+                cursor.execute(f"""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables
+                        WHERE table_schema = 'public'
+                        AND table_name = '{table}'
+                    );
+                """)
+                table_exists = cursor.fetchone()[0]
+                if not table_exists:
+                    print(f"Table {table} does not exist. Running migrations again...")
+                    os.system("python manage.py migrate --noinput")
+                    break
+
+        return True
+    except Exception as e:
+        print(f"Error ensuring tables exist: {e}")
+        return False
+
 if __name__ == '__main__':
     success = reset_postgres_database()
     if success:
         print("Now run migrations to recreate the tables.")
-        # Run migrations
-        os.system("python manage.py migrate")
+        # Ensure all tables exist
+        ensure_tables_exist()
         # Create superuser
         os.system("python setup_manager.py")
     else:

@@ -34,6 +34,8 @@ echo "Setting up database..."
 # Make the initialization script executable
 chmod +x init_db.py
 chmod +x setup_manager.py
+chmod +x reset_postgres.py
+chmod +x fix_session_table.py
 
 # Check if we're running on Render
 if [ "$RENDER" = "true" ]; then
@@ -49,25 +51,30 @@ if [ "$RENDER" = "true" ]; then
         # Force using settings_prod for migrations
         export DJANGO_SETTINGS_MODULE=myday.settings_prod
 
-        # First, try to run migrations with --fake-initial to handle existing tables
-        echo "Running migrations on PostgreSQL database..."
-        python manage.py migrate --fake-initial || {
-            echo "Initial migrations failed, trying with --fake..."
+        # First, try standard migrations to create tables properly
+        echo "Running standard migrations on PostgreSQL database..."
+        python manage.py migrate --noinput || {
+            echo "Standard migrations failed, checking for session table..."
 
-            # If that fails, try with --fake
-            python manage.py migrate --fake || {
-                echo "Fake migrations failed, trying with standard migrations..."
+            # Check and fix django_session table
+            python fix_session_table.py || {
+                echo "Session table does not exist, trying with --fake-initial..."
 
-                # Try standard migrations as a last resort
-                python manage.py migrate || {
-                    echo "All migration attempts failed, trying to reset PostgreSQL database..."
+                # Try with --fake-initial
+                python manage.py migrate --fake-initial --noinput || {
+                    echo "Fake-initial migrations failed, trying with --fake..."
 
-                    # Make the reset script executable
-                    chmod +x reset_postgres.py
+                    # If that fails, try with --fake
+                    python manage.py migrate --fake --noinput || {
+                        echo "All migration attempts failed, trying to reset PostgreSQL database..."
 
-                    # Try to reset the PostgreSQL database
-                    python reset_postgres.py || {
-                        echo "PostgreSQL database reset failed, but continuing build process..."
+                        # Make the reset script executable
+                        chmod +x reset_postgres.py
+
+                        # Try to reset the PostgreSQL database
+                        python reset_postgres.py || {
+                            echo "PostgreSQL database reset failed, but continuing build process..."
+                        }
                     }
                 }
             }
@@ -108,6 +115,10 @@ else
         }
     }
 fi
+
+# Make sure session table exists
+echo "Ensuring session table exists..."
+python fix_session_table.py
 
 # Set up manager user
 echo "Setting up manager user..."
