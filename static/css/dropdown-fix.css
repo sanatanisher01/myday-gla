@@ -1,0 +1,24 @@
+/* Fix for dropdown menu text color */
+.dropdown-menu {
+    background-color: #ffffff;
+}
+
+.dropdown-item {
+    color: #000000 !important; /* Black text color */
+    font-weight: 500;
+}
+
+.dropdown-item:hover {
+    color: var(--primary) !important;
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+/* Make sure icons in dropdown are also visible */
+.dropdown-item i {
+    color: #333333;
+    margin-right: 8px;
+}
+
+.dropdown-item:hover i {
+    color: var(--primary);
+}
