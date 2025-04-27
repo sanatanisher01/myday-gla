@@ -68,11 +68,14 @@ def chat_room(request, user_id):
     ).order_by('timestamp')
 
     # Mark messages from other user as read
-    ChatMessage.objects.filter(
-        sender=other_user,
-        receiver=request.user,
-        is_read=False
-    ).update(is_read=True)
+    # Only mark as read if it's a GET request (initial page load)
+    # For POST requests (sending messages), we don't mark as read to avoid race conditions
+    if request.method == 'GET':
+        ChatMessage.objects.filter(
+            sender=other_user,
+            receiver=request.user,
+            is_read=False
+        ).update(is_read=True)
 
     # Handle message submission
     if request.method == 'POST':

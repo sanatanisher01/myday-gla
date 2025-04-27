@@ -7,8 +7,8 @@
     <title>{% block title %}MyDay - Event Booking & Management{% endblock %}</title>
 
     <!-- Favicons -->
-    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
-    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="icon" href="https://res.cloudinary.com/dbxwr2avj/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1745262516/d18xMDAwLGFyXzE6MSxjX2ZpbGwsZ19hdXRvLGVfYXJ0Omhva3VzYWk_lxj4pf.png" type="image/png">
+    <link rel="shortcut icon" href="https://res.cloudinary.com/dbxwr2avj/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1745262516/d18xMDAwLGFyXzE6MSxjX2ZpbGwsZ19hdXRvLGVfYXJ0Omhva3VzYWk_lxj4pf.png" type="image/png">
     <!-- Simplified to avoid static file issues -->
     <meta name="msapplication-TileColor" content="#2b5797">
 
@@ -48,6 +48,20 @@
     <link rel="stylesheet" href="{% static 'css/tab-title.css' %}">
     <link rel="stylesheet" href="{% static 'css/auth-pages.css' %}">
 
+    <style>
+        .navbar-logo {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .footer-logo {
+            border-radius: 50%;
+            object-fit: cover;
+        }
+    </style>
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -55,7 +69,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'events:home' %}">
-                <!-- Use text instead of image to avoid static file issues -->
+                <img src="https://res.cloudinary.com/dbxwr2avj/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1745262516/d18xMDAwLGFyXzE6MSxjX2ZpbGwsZ19hdXRvLGVfYXJ0Omhva3VzYWk_lxj4pf.png" alt="MyDay Logo" class="navbar-logo me-2">
                 <span class="fw-bold fs-4">MyDay</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation" title="Toggle navigation">
@@ -156,8 +170,8 @@
                 <div class="row">
                     <!-- Company Info -->
                     <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
-                        <div class="footer-logo-wrapper">
-                            <!-- Use text only to avoid static file issues -->
+                        <div class="footer-logo-wrapper d-flex align-items-center">
+                            <img src="https://res.cloudinary.com/dbxwr2avj/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1745262516/d18xMDAwLGFyXzE6MSxjX2ZpbGwsZ19hdXRvLGVfYXJ0Omhva3VzYWk_lxj4pf.png" alt="MyDay Logo" class="footer-logo me-2" width="40" height="40">
                             <span class="footer-logo-text">MyDay</span>
                         </div>
                         <p class="footer-about mt-3">Your premier destination for event booking and management. We make your special occasions truly memorable.</p>

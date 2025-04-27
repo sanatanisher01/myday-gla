@@ -642,13 +642,46 @@
                 return;
             }
 
-            // Submit the form normally for text messages
-            this.submit();
+            // For text messages, use fetch to submit the form and handle the response
+            const formData = new FormData(this);
 
-            // Clear the input field after submission
-            setTimeout(() => {
+            // Create a temporary message element to show immediately
+            const tempMessageId = 'temp-' + Date.now();
+            const tempMessageEl = document.createElement('div');
+            tempMessageEl.className = 'chat-message sent';
+            tempMessageEl.setAttribute('data-message-id', tempMessageId);
+            tempMessageEl.innerHTML = `
+                ${messageInput.value}
+                <div class="timestamp">Just now</div>
+            `;
+
+            // Add the temporary message to the chat
+            chatMessages.appendChild(tempMessageEl);
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Submit the form via AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                // Clear the input field after submission
                 messageInput.value = '';
-            }, 100);
+
+                // Check for new messages immediately to get the real message with proper ID
+                setTimeout(checkForNewMessages, 500);
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                // Remove the temporary message if there was an error
+                document.querySelector(`[data-message-id="${tempMessageId}"]`)?.remove();
+                alert('Failed to send message. Please try again.');
+            });
         });
 
         // Upload file to server
@@ -686,8 +719,76 @@
                     // Reset upload state
                     currentFile = null;
                     uploadPreview.style.display = 'none';
-                    // Submit the form
-                    messageForm.submit();
+
+                    // Create a temporary message element to show immediately
+                    const tempMessageId = 'temp-' + Date.now();
+                    const tempMessageEl = document.createElement('div');
+                    tempMessageEl.className = 'chat-message sent';
+                    tempMessageEl.setAttribute('data-message-id', tempMessageId);
+
+                    // Create appropriate content based on file type
+                    let tempContent = '';
+                    if (data.file_type === 'image') {
+                        tempContent = `
+                            <div class="chat-media-container">
+                                <img src="${data.url}" class="chat-media" alt="${data.filename}" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="${data.url}">
+                                <div class="mt-1 small text-muted">${data.filename}</div>
+                            </div>
+                        `;
+                    } else if (data.file_type === 'video') {
+                        tempContent = `
+                            <div class="chat-media-container">
+                                <div class="video-container">
+                                    <video class="chat-video" data-bs-toggle="modal" data-bs-target="#videoModal" data-video-src="${data.url}">
+                                        <source src="${data.url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="video-play-button">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-1 small text-muted">${data.filename}</div>
+                            </div>
+                        `;
+                    }
+
+                    tempMessageEl.innerHTML = `
+                        ${tempContent}
+                        <div class="timestamp">Just now</div>
+                    `;
+
+                    // Add the temporary message to the chat
+                    chatMessages.appendChild(tempMessageEl);
+
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                    // Submit the form via AJAX
+                    const formData = new FormData(messageForm);
+
+                    fetch(messageForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        // Clear the input field after submission
+                        messageInput.value = '';
+
+                        // Check for new messages immediately to get the real message with proper ID
+                        setTimeout(checkForNewMessages, 500);
+
+                        // Initialize event listeners for the new media element
+                        initializeMediaEventListeners();
+                    })
+                    .catch(error => {
+                        console.error('Error sending message:', error);
+                        // Remove the temporary message if there was an error
+                        document.querySelector(`[data-message-id="${tempMessageId}"]`)?.remove();
+                        alert('Failed to send message. Please try again.');
+                    });
                 } else {
                     previewContent.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>Upload failed</div>`;
                 }
