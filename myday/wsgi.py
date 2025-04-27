@@ -12,10 +12,10 @@ import sys
 
 from django.core.wsgi import get_wsgi_application
 
-# Check if we're running on Render
+# Use settings_prod for Render deployment
 if os.environ.get('RENDER', '').lower() == 'true':
-    print("Running on Render, using settings_render.py", file=sys.stderr)
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings_render')
+    print("Running on Render, using settings_prod.py", file=sys.stderr)
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings_prod')
 else:
     print("Running locally, using settings.py", file=sys.stderr)
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings')

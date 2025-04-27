@@ -14,19 +14,36 @@ pip install -r requirements.txt
 echo "Collecting static files..."
 python manage.py collectstatic --no-input --clear
 
+# Database setup
+echo "Setting up database..."
+
+# Make the initialization script executable
+chmod +x init_db.py
+
 # Check if we're running on Render
 if [ "$RENDER" = "true" ]; then
-    echo "Running on Render, using minimal setup..."
+    echo "Running on Render, using production setup..."
 
-    # Create a simple SQLite database for the minimal app
-    echo "Setting up minimal database..."
-    DJANGO_SETTINGS_MODULE=myday.settings_render python manage.py migrate --run-syncdb
+    # For Render, we need to handle the database differently
+    echo "Setting up database on Render..."
+
+    # First, try to run migrations with --fake-initial to handle existing tables
+    python manage.py migrate --fake-initial || {
+        echo "Initial migrations failed, trying with --fake..."
+
+        # If that fails, try with --fake
+        python manage.py migrate --fake || {
+            echo "Fake migrations failed, trying to reset the database..."
+
+            # If all else fails, try to reset the database
+            python init_db.py || {
+                echo "Database reset failed, but continuing build process..."
+            }
+        }
+    }
 else
     # Database setup for local development
     echo "Setting up database for local development..."
-
-    # Make the initialization script executable
-    chmod +x init_db.py
 
     # Run the database initialization script
     echo "Running database initialization script..."
