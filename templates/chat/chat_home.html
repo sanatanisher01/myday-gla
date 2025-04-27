@@ -116,7 +116,7 @@
                 <div class="chat-sidebar">
                     {% if chat_list %}
                         {% for chat in chat_list %}
-                            <a href="{% url 'chat_room' user_id=chat.user.id %}" class="text-decoration-none">
+                            <a href="{% url 'chat:chat_room' user_id=chat.user.id %}" class="text-decoration-none">
                                 <div class="chat-list-item d-flex align-items-center">
                                     <div class="avatar me-3">
                                         {% if chat.user.profile.profile_picture %}
@@ -192,7 +192,7 @@
                 <div class="list-group">
                     {% if available_users %}
                         {% for user in available_users %}
-                            <a href="{% url 'create_chat' user_id=user.id %}" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <a href="{% url 'chat:create_chat' user_id=user.id %}" class="list-group-item list-group-item-action d-flex align-items-center">
                                 <div class="avatar me-3">
                                     {% if user.profile.profile_picture %}
                                         <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle" width="40">

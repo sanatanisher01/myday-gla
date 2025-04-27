@@ -15,7 +15,7 @@
         border-radius: var(--border-radius);
         overflow: hidden;
     }
-    
+
     .gallery-header::before {
         content: '';
         position: absolute;
@@ -26,12 +26,12 @@
         background: linear-gradient(to right, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%);
         z-index: 1;
     }
-    
+
     .gallery-header-content {
         position: relative;
         z-index: 2;
     }
-    
+
     .gallery-item {
         position: relative;
         border-radius: var(--border-radius);
@@ -40,18 +40,18 @@
         margin-bottom: 1.5rem;
         transition: all 0.3s ease;
     }
-    
+
     .gallery-item:hover {
         transform: translateY(-5px);
         box-shadow: var(--hover-shadow);
     }
-    
+
     .gallery-image {
         width: 100%;
         height: 200px;
         object-fit: cover;
     }
-    
+
     .gallery-caption {
         position: absolute;
         bottom: 0;
@@ -61,7 +61,7 @@
         background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
         color: white;
     }
-    
+
     .gallery-actions {
         position: absolute;
         top: 10px;
@@ -69,11 +69,11 @@
         opacity: 0;
         transition: all 0.3s ease;
     }
-    
+
     .gallery-item:hover .gallery-actions {
         opacity: 1;
     }
-    
+
     .gallery-action {
         width: 36px;
         height: 36px;
@@ -86,16 +86,16 @@
         margin-left: 0.5rem;
         transition: all 0.3s ease;
     }
-    
+
     .gallery-action:hover {
         transform: scale(1.1);
     }
-    
+
     .empty-gallery {
         text-align: center;
         padding: 3rem;
     }
-    
+
     .empty-gallery-icon {
         font-size: 4rem;
         color: #ccc;
@@ -114,10 +114,10 @@
                 <p class="lead mb-0">Manage your event gallery images</p>
             </div>
             <div class="col-md-4 text-md-end mt-4 mt-md-0">
-                <a href="{% url 'add_event_image' event.slug %}" class="btn btn-primary">
+                <a href="{% url 'events:add_event_image' event.slug %}" class="btn btn-primary">
                     <i class="fas fa-plus me-2"></i> Add Image
                 </a>
-                <a href="{% url 'event_detail' event.slug %}" class="btn btn-light ms-2">
+                <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-light ms-2">
                     <i class="fas fa-eye me-2"></i> View Event
                 </a>
             </div>
@@ -141,7 +141,7 @@
                             <a href="{{ image.image.url }}" class="gallery-action text-primary" target="_blank" title="View Full Size">
                                 <i class="fas fa-search-plus"></i>
                             </a>
-                            <a href="{% url 'delete_event_image' image.id %}" class="gallery-action text-danger" title="Delete Image">
+                            <a href="{% url 'events:delete_event_image' image.id %}" class="gallery-action text-danger" title="Delete Image">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </div>
@@ -157,7 +157,7 @@
                 </div>
                 <h4>No Images in Gallery</h4>
                 <p class="text-muted mb-4">Add images to showcase your event to potential customers.</p>
-                <a href="{% url 'add_event_image' event.slug %}" class="btn btn-primary btn-lg">
+                <a href="{% url 'events:add_event_image' event.slug %}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus me-2"></i> Add Your First Image
                 </a>
             </div>
