@@ -16,7 +16,7 @@ class DatabaseErrorMiddleware:
         self.db_available = False
         self.app_startup_time = time.time()
         self.app_ready = False
-        self.max_startup_time = 60  # seconds (reduced from 120 to 60)
+        self.max_startup_time = 15  # seconds (reduced from 60 to 15 seconds)
 
         # Print database configuration on startup
         print("Database configuration at middleware initialization:", file=sys.stderr)
@@ -24,15 +24,31 @@ class DatabaseErrorMiddleware:
         print(f"Database name: {settings.DATABASES['default']['NAME']}", file=sys.stderr)
 
     def __call__(self, request):
-        # Skip database check for static files, health check, maintenance page, and loading page
+        # Skip database check for static files, health check, maintenance page, loading page, and other non-critical paths
         if (request.path.startswith('/static/') or
             request.path == '/maintenance/' or
             request.path == '/loading/' or
             request.path.startswith('/health') or
             request.path == '/favicon.ico' or
+            request.path == '/fallback.html' or
+            request.path == '/robots.txt' or
+            request.path == '/sitemap.xml' or
             request.method == 'HEAD' or
             request.method == 'OPTIONS'):
             return self.get_response(request)
+
+        # For the home page during startup, serve a static fallback page
+        if request.path == '/' and not self.app_ready:
+            from django.http import FileResponse
+            import os
+            fallback_path = os.path.join(settings.STATIC_ROOT, 'fallback.html')
+            if os.path.exists(fallback_path):
+                return FileResponse(open(fallback_path, 'rb'))
+            else:
+                # If fallback.html doesn't exist in STATIC_ROOT, try the static directory
+                fallback_path = os.path.join(settings.BASE_DIR, 'static', 'fallback.html')
+                if os.path.exists(fallback_path):
+                    return FileResponse(open(fallback_path, 'rb'))
 
         # Check if the app is still in startup phase
         current_time = time.time()

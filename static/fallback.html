@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyDay - Waking Up</title>
-    <meta http-equiv="refresh" content="15;url=/">
+    <title>MyDay - Loading</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -61,7 +60,7 @@
             height: 100%;
             background-color: #4a6bdf;
             width: 0%;
-            animation: progress 60s linear forwards;
+            animation: progress 15s linear forwards;
         }
         @keyframes progress {
             0% { width: 0%; }
@@ -73,28 +72,26 @@
             90% { width: 95%; }
             100% { width: 100%; }
         }
+        .btn {
+            display: inline-block;
+            background-color: #4a6bdf;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
     </style>
-</head>
-<body>
-    <div class="container">
-        <img src="/static/images/logos/myday-logo.png" alt="MyDay Logo" class="logo">
-        <h1>Waking Up MyDay</h1>
-        <p>Our application is starting up. This usually takes about 15 seconds on the first visit.</p>
-        <div class="spinner"></div>
-        <div class="progress">
-            <div class="progress-bar"></div>
-        </div>
-        <p>You'll be redirected automatically once the application is ready.</p>
-    </div>
     <script>
-        // Redirect after 15 seconds if the meta refresh doesn't work
+        // Redirect to the main site after 15 seconds
         setTimeout(() => {
             window.location.href = '/';
         }, 15000);
-
+        
         // Check if the site is ready every 3 seconds
         let checkInterval = setInterval(() => {
-            fetch('/health/?from_loading=true', {
+            fetch('/health/?from_loading=true', { 
                 method: 'GET',
                 headers: { 'Accept': 'application/json' }
             })
@@ -115,5 +112,18 @@
             });
         }, 3000);
     </script>
+</head>
+<body>
+    <div class="container">
+        <img src="https://res.cloudinary.com/dbxwr2avj/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1745262516/d18xMDAwLGFyXzE6MSxjX2ZpbGwsZ19hdXRvLGVfYXJ0Omhva3VzYWk_lxj4pf.png" alt="MyDay Logo" class="logo">
+        <h1>MyDay is Starting</h1>
+        <p>Please wait while our application is loading. This should take less than 15 seconds.</p>
+        <div class="spinner"></div>
+        <div class="progress">
+            <div class="progress-bar"></div>
+        </div>
+        <p>You'll be redirected automatically once the application is ready.</p>
+        <a href="/" class="btn">Try Now</a>
+    </div>
 </body>
 </html>

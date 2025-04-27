@@ -58,45 +58,47 @@ class RenderWakeupMiddleware:
 
     def _warmup_application(self):
         """
-        Perform warmup tasks to speed up application initialization.
-        This function preloads essential components to reduce startup time.
+        Perform minimal warmup tasks to speed up application initialization.
+        This function does the bare minimum to get the app running quickly.
         """
         try:
-            logger.info("Starting application warmup")
+            logger.info("Starting minimal application warmup")
 
             # Import necessary modules here to preload them
             from django.db import connection
-            from django.contrib.auth.models import User
-            from events.models import Event
-            from bookings.models import Booking
 
             # Perform a simple database query to warm up the connection
-            try:
-                with connection.cursor() as cursor:
-                    cursor.execute("SELECT 1")
-                    cursor.fetchone()
-                logger.info("Database connection warmed up")
-            except Exception as db_error:
-                logger.error(f"Database warmup error: {db_error}")
+            # but don't wait for it to complete
+            def warm_db_async():
+                try:
+                    with connection.cursor() as cursor:
+                        cursor.execute("SELECT 1")
+                        cursor.fetchone()
+                    logger.info("Database connection warmed up")
 
-            # Preload essential model data
-            try:
-                # Count users to warm up auth models
-                user_count = User.objects.count()
-                # Count events to warm up event models
-                event_count = Event.objects.count()
-                # Count bookings to warm up booking models
-                booking_count = Booking.objects.count()
+                    # Mark warmup as complete immediately after basic DB check
+                    self.is_waking_up = False
+                except Exception as db_error:
+                    logger.error(f"Database warmup error: {db_error}")
+                    # Even if there's an error, mark as not waking up so users can proceed
+                    self.is_waking_up = False
 
-                logger.info(f"Model cache warmed up: {user_count} users, {event_count} events, {booking_count} bookings")
-            except Exception as model_error:
-                logger.error(f"Model warmup error: {model_error}")
+            # Start database warmup in a separate thread
+            import threading
+            db_thread = threading.Thread(target=warm_db_async)
+            db_thread.daemon = True
+            db_thread.start()
 
-            # Mark warmup as complete after a maximum of 30 seconds
-            # This ensures we don't keep users waiting too long
-            time.sleep(0.5)  # Small delay to ensure other processes can start
+            # Don't wait for the thread to complete - let it run in background
+            # This allows users to see the site immediately
 
-            logger.info("Application warmup complete")
+            # Mark as not waking up after a very short time regardless
+            # This ensures users aren't stuck on the loading page
+            time.sleep(0.1)  # Very minimal delay
+
+            logger.info("Minimal application warmup complete")
+            # Note: The actual is_waking_up flag will be set to False by the background thread
+            # But we set it here as well as a fallback
             self.is_waking_up = False
         except Exception as e:
             logger.error(f"Error during application warmup: {e}")
