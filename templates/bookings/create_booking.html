@@ -108,7 +108,7 @@
                         <h4 class="mb-0">Price Summary</h4>
                     </div>
                     <div class="card-body">
-                        <!-- Price breakdown -->
+                        <!-- Price breakdown with consistent currency symbols -->
                         <div class="d-flex justify-content-between mb-2">
                             <span>Sub-events:</span>
                             <span id="sub-event-prices">₹0.00</span>
@@ -123,7 +123,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Discount:</span>
-                            <span id="discount-amount" data-percentage="0">₹0.00</span>
+                            <span id="discount-amount" data-percentage="0">- ₹0.00 (0%)</span>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
@@ -346,19 +346,6 @@
             // Sum up the total
             totalPrice = subEventPrices + categoryPrices;
 
-            // Update the price breakdown in the UI
-            const subEventPriceElement = document.getElementById('sub-event-prices');
-            const categoryPriceElement = document.getElementById('category-prices');
-
-            // If we have price breakdown elements, update them
-            if (subEventPriceElement) {
-                subEventPriceElement.textContent = `₹${subEventPrices.toFixed(2)}`;
-            }
-
-            if (categoryPriceElement) {
-                categoryPriceElement.textContent = `₹${categoryPrices.toFixed(2)}`;
-            }
-
             console.log(`Price breakdown - Sub-events: ₹${subEventPrices.toFixed(2)}, Categories: ₹${categoryPrices.toFixed(2)}`);
             console.log(`Final calculated total price: ₹${totalPrice.toFixed(2)}`);
 
@@ -375,9 +362,20 @@
                 discountElement.textContent = '- ₹0.00 (0%)';
             }
 
-            // Update price displays
+            // Update price displays with consistent currency symbols (₹)
             const totalPriceElement = document.getElementById('total-price');
             const finalPriceElement = document.getElementById('final-price');
+            const subEventPriceElement = document.getElementById('sub-event-prices');
+            const categoryPriceElement = document.getElementById('category-prices');
+
+            // Update all price elements with the ₹ symbol
+            if (subEventPriceElement) {
+                subEventPriceElement.textContent = `₹${subEventPrices.toFixed(2)}`;
+            }
+
+            if (categoryPriceElement) {
+                categoryPriceElement.textContent = `₹${categoryPrices.toFixed(2)}`;
+            }
 
             if (totalPriceElement) {
                 totalPriceElement.textContent = `₹${totalPrice.toFixed(2)}`;
