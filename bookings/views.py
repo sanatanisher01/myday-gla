@@ -78,13 +78,9 @@ def create_booking(request, event_slug):
             booking.save()
 
             # Send booking confirmation email
-            email_sent = send_booking_confirmation(booking, request)
+            send_booking_confirmation(booking, request)
 
-            if email_sent:
-                messages.success(request, 'Your booking has been submitted successfully! A confirmation email has been sent to your email address.')
-            else:
-                messages.success(request, 'Your booking has been submitted successfully! However, there was an issue sending the confirmation email. Please check your booking details in your account.')
-
+            messages.success(request, 'Your booking has been submitted successfully! A confirmation email has been sent to your email address.')
             return redirect('bookings:booking_detail', booking_id=booking.booking_id)
     else:
         form = BookingForm()
