@@ -305,6 +305,30 @@
                                                     </a>
                                                 </div>
                                             </div>
+
+                                            {% if sub_event.categories.exists %}
+                                                <div class="mt-3">
+                                                    <h6 class="small fw-bold">Categories:</h6>
+                                                    <ul class="list-group list-group-flush mt-2">
+                                                        {% for category in sub_event.categories.all %}
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                                                <div>
+                                                                    <span class="small fw-medium">{{ category.name }}</span>
+                                                                    <span class="badge bg-primary ms-2">₹{{ category.price }}</span>
+                                                                </div>
+                                                                <div class="btn-group btn-group-sm">
+                                                                    <a href="{% url 'events:edit_category' category.id %}" class="btn btn-outline-primary btn-sm" title="Edit Category">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                    <a href="{% url 'events:delete_category' category.id %}" class="btn btn-outline-danger btn-sm" title="Delete Category">
+                                                                        <i class="fas fa-trash-alt"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
