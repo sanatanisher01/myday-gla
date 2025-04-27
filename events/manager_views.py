@@ -13,7 +13,7 @@ def manager_dashboard(request):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     try:
         # Get events created by this manager
@@ -25,7 +25,7 @@ def manager_dashboard(request):
         # Log the error and show a friendly message
         print(f"Error in manager_dashboard: {e}")
         messages.error(request, 'There was an error loading your dashboard. Please try again later.')
-        return redirect('home')
+        return redirect('events:home')
 
     # Calculate statistics
     total_events = events.count()
@@ -141,7 +141,7 @@ def manager_events(request):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     events = Event.objects.filter(created_by=request.user).annotate(
         booking_count=Count('bookings'),
@@ -159,7 +159,7 @@ def manager_event_detail(request, slug):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     event = get_object_or_404(Event, slug=slug, created_by=request.user)
     sub_events = event.sub_events.all()

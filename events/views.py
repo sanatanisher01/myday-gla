@@ -151,7 +151,7 @@ def create_event(request):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
@@ -160,7 +160,7 @@ def create_event(request):
             event.created_by = request.user
             event.save()
             messages.success(request, 'Event created successfully!')
-            return redirect('event_gallery', slug=event.slug)
+            return redirect('events:event_gallery', slug=event.slug)
     else:
         form = EventForm()
 
@@ -176,7 +176,7 @@ def edit_event(request, slug):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     event = get_object_or_404(Event, slug=slug, created_by=request.user)
 
@@ -185,7 +185,7 @@ def edit_event(request, slug):
         if form.is_valid():
             form.save()
             messages.success(request, 'Event updated successfully!')
-            return redirect('manager_events')
+            return redirect('events:manager_events')
     else:
         form = EventForm(instance=event)
 
@@ -202,14 +202,14 @@ def delete_event(request, slug):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     event = get_object_or_404(Event, slug=slug, created_by=request.user)
 
     if request.method == 'POST':
         event.delete()
         messages.success(request, 'Event deleted successfully!')
-        return redirect('manager_events')
+        return redirect('events:manager_events')
 
     context = {
         'event': event
@@ -223,7 +223,7 @@ def create_sub_event(request, event_slug):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     event = get_object_or_404(Event, slug=event_slug, created_by=request.user)
 
@@ -234,7 +234,7 @@ def create_sub_event(request, event_slug):
             sub_event.event = event
             sub_event.save()
             messages.success(request, 'Sub-event created successfully!')
-            return redirect('event_detail', slug=event_slug)
+            return redirect('events:event_detail', slug=event_slug)
     else:
         form = SubEventForm()
 
@@ -251,7 +251,7 @@ def edit_sub_event(request, sub_event_id):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     sub_event = get_object_or_404(SubEvent, id=sub_event_id, event__created_by=request.user)
 
@@ -260,7 +260,7 @@ def edit_sub_event(request, sub_event_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Sub-event updated successfully!')
-            return redirect('event_detail', slug=sub_event.event.slug)
+            return redirect('events:event_detail', slug=sub_event.event.slug)
     else:
         form = SubEventForm(instance=sub_event)
 
@@ -278,7 +278,7 @@ def delete_sub_event(request, sub_event_id):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     sub_event = get_object_or_404(SubEvent, id=sub_event_id, event__created_by=request.user)
     event_slug = sub_event.event.slug
@@ -286,7 +286,7 @@ def delete_sub_event(request, sub_event_id):
     if request.method == 'POST':
         sub_event.delete()
         messages.success(request, 'Sub-event deleted successfully!')
-        return redirect('event_detail', slug=event_slug)
+        return redirect('events:event_detail', slug=event_slug)
 
     context = {
         'sub_event': sub_event,
@@ -301,7 +301,7 @@ def create_category(request, sub_event_id):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     sub_event = get_object_or_404(SubEvent, id=sub_event_id, event__created_by=request.user)
 
@@ -312,7 +312,7 @@ def create_category(request, sub_event_id):
             category.sub_event = sub_event
             category.save()
             messages.success(request, 'Category created successfully!')
-            return redirect('event_detail', slug=sub_event.event.slug)
+            return redirect('events:event_detail', slug=sub_event.event.slug)
     else:
         form = CategoryForm()
 
@@ -330,7 +330,7 @@ def edit_category(request, category_id):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     category = get_object_or_404(Category, id=category_id, sub_event__event__created_by=request.user)
 
@@ -339,7 +339,7 @@ def edit_category(request, category_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Category updated successfully!')
-            return redirect('event_detail', slug=category.sub_event.event.slug)
+            return redirect('events:event_detail', slug=category.sub_event.event.slug)
     else:
         form = CategoryForm(instance=category)
 
@@ -358,7 +358,7 @@ def delete_category(request, category_id):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     category = get_object_or_404(Category, id=category_id, sub_event__event__created_by=request.user)
     event_slug = category.sub_event.event.slug
@@ -366,7 +366,7 @@ def delete_category(request, category_id):
     if request.method == 'POST':
         category.delete()
         messages.success(request, 'Category deleted successfully!')
-        return redirect('event_detail', slug=event_slug)
+        return redirect('events:event_detail', slug=event_slug)
 
     context = {
         'category': category,
@@ -382,7 +382,7 @@ def event_gallery(request, slug):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     event = get_object_or_404(Event, slug=slug, created_by=request.user)
     gallery_images = event.gallery_images.all()
@@ -399,7 +399,7 @@ def add_event_image(request, slug):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     event = get_object_or_404(Event, slug=slug, created_by=request.user)
 
@@ -410,7 +410,7 @@ def add_event_image(request, slug):
             gallery_image.event = event
             gallery_image.save()
             messages.success(request, 'Image added to gallery successfully!')
-            return redirect('event_gallery', slug=slug)
+            return redirect('events:event_gallery', slug=slug)
     else:
         form = EventGalleryForm()
 
@@ -427,7 +427,7 @@ def delete_event_image(request, image_id):
     # Check if user is a manager
     if not request.user.profile.is_manager:
         messages.error(request, 'You do not have permission to access this page.')
-        return redirect('home')
+        return redirect('events:home')
 
     image = get_object_or_404(EventGallery, id=image_id, event__created_by=request.user)
     event_slug = image.event.slug
@@ -435,7 +435,7 @@ def delete_event_image(request, image_id):
     if request.method == 'POST':
         image.delete()
         messages.success(request, 'Image deleted successfully!')
-        return redirect('event_gallery', slug=event_slug)
+        return redirect('events:event_gallery', slug=event_slug)
 
     context = {
         'image': image,
