@@ -16,31 +16,22 @@ python manage.py collectstatic --no-input --clear
 
 # Database setup
 echo "Setting up database..."
-# First, try to fake all migrations to establish a baseline
-echo "Faking all migrations to establish a baseline..."
-python manage.py migrate --fake || {
-    echo "Faking all migrations failed, trying individual app migrations..."
 
-    # Try to migrate each app individually with --fake
-    for app in auth contenttypes admin sessions accounts events bookings chat; do
-        echo "Faking migrations for $app..."
-        python manage.py migrate $app --fake || echo "Failed to fake migrations for $app, but continuing..."
-    done
-}
+# Make the initialization script executable
+chmod +x init_db.py
 
-# Now try regular migrations
-echo "Running regular migrations..."
-python manage.py migrate || {
-    echo "Regular migrations failed, trying with --fake-initial flag..."
-    python manage.py migrate --fake-initial || {
-        echo "All migration attempts failed, but continuing build process..."
+# Run the database initialization script
+echo "Running database initialization script..."
+python init_db.py || {
+    echo "Database initialization script failed, trying standard migrations..."
+
+    # Try standard migrations as a fallback
+    python manage.py migrate || {
+        echo "Standard migrations failed, trying with --fake flag..."
+        python manage.py migrate --fake || {
+            echo "All migration attempts failed, but continuing build process..."
+        }
     }
-}
-
-# Try to initialize database with sample data
-echo "Initializing database with sample data..."
-python manage.py initialize_db || {
-    echo "Database initialization failed, but continuing build process..."
 }
 
 echo "Build process completed."

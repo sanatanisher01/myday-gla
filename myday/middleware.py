@@ -20,8 +20,11 @@ class DatabaseErrorMiddleware:
         print(f"Database name: {settings.DATABASES['default']['NAME']}", file=sys.stderr)
 
     def __call__(self, request):
-        # Skip database check for static files and maintenance page
-        if request.path.startswith('/static/') or request.path == '/maintenance/':
+        # Skip database check for static files, health check, and maintenance page
+        if (request.path.startswith('/static/') or
+            request.path == '/maintenance/' or
+            request.path == '/health/' or
+            request.path == '/favicon.ico'):
             return self.get_response(request)
 
         # If we're using SQLite, we can proceed without checking connection
