@@ -33,11 +33,14 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-hy&j5v%e!bxdub
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']  # Allow all hosts while debugging
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app']  # Allow localhost and ngrok domains
 
 # CSRF settings for secure cookies
 CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
+
+# CSRF trusted origins for Ngrok
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']
 
 # Security headers
 SECURE_HSTS_SECONDS = 0 if DEBUG else 3600  # Set to 31536000 for production

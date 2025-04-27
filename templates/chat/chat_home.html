@@ -114,43 +114,38 @@
                     </button>
                 </div>
                 <div class="chat-sidebar">
-                    {% if chat_rooms %}
-                        {% for room in chat_rooms %}
-                            <a href="{% url 'chat_room' room_id=room.id %}" class="text-decoration-none">
+                    {% if chat_list %}
+                        {% for chat in chat_list %}
+                            <a href="{% url 'chat_room' user_id=chat.user.id %}" class="text-decoration-none">
                                 <div class="chat-list-item d-flex align-items-center">
                                     <div class="avatar me-3">
-                                        {% if room.other_user.profile.profile_picture %}
-                                            <img src="{{ room.other_user.profile.profile_picture.url }}" alt="{{ room.other_user.get_full_name }}" class="img-fluid rounded-circle">
+                                        {% if chat.user.profile.profile_picture %}
+                                            <img src="{{ chat.user.profile.profile_picture.url }}" alt="{{ chat.user.get_full_name }}" class="img-fluid rounded-circle">
                                         {% else %}
-                                            {{ room.other_user.first_name|first|upper }}{{ room.other_user.last_name|first|upper }}
+                                            {{ chat.user.first_name|first|upper }}{{ chat.user.last_name|first|upper }}
                                         {% endif %}
                                     </div>
                                     <div class="chat-info">
                                         <div class="d-flex justify-content-between">
-                                            <div class="chat-name">{{ room.other_user.get_full_name|default:room.other_user.username }}</div>
-                                            {% if room.last_message %}
-                                                <div class="chat-time">{{ room.last_message.created_at|date:"g:i A" }}</div>
+                                            <div class="chat-name">{{ chat.user.get_full_name|default:chat.user.username }}</div>
+                                            {% if chat.latest_message %}
+                                                <div class="chat-time">{{ chat.timestamp|date:"g:i A" }}</div>
                                             {% endif %}
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <div class="chat-preview">
-                                                {% if room.last_message %}
-                                                    {% if room.last_message.message_type == 'image' %}
+                                                {% if chat.latest_message %}
+                                                    {% if chat.latest_message.message_type == 'image' %}
                                                         <i class="fas fa-image"></i> Image
-                                                    {% elif room.last_message.message_type == 'file' %}
-                                                        <i class="fas fa-file"></i> File
+                                                    {% elif chat.latest_message.message_type == 'video' %}
+                                                        <i class="fas fa-video"></i> Video
                                                     {% else %}
-                                                        {{ room.last_message.message|truncatechars:30 }}
+                                                        {{ chat.latest_message.message|truncatechars:30 }}
                                                     {% endif %}
                                                 {% else %}
                                                     No messages yet
                                                 {% endif %}
                                             </div>
-                                            {% with unread_count=room.unread_count|default:0 %}
-                                                {% if unread_count > 0 %}
-                                                    <div class="unread-badge">{{ unread_count }}</div>
-                                                {% endif %}
-                                            {% endwith %}
                                         </div>
                                     </div>
                                 </div>

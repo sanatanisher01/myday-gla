@@ -246,7 +246,7 @@
 
                 <div class="chat-messages" id="chat-messages">
                     {% for message in messages %}
-                        <div class="chat-message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                        <div class="chat-message {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
                             {% if message.message_type == 'image' %}
                                 <div class="chat-media-container">
                                     <img src="{{ message.file_url|default:message.message }}" class="chat-media" alt="{{ message.message }}" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="{{ message.file_url|default:message.message }}">
@@ -268,7 +268,7 @@
                             {% else %}
                                 {{ message.message }}
                             {% endif %}
-                            <div class="timestamp">{{ message.created_at|date:"M d, g:i a" }}</div>
+                            <div class="timestamp">{{ message.timestamp|date:"M d, g:i a" }}</div>
                         </div>
                     {% empty %}
                         <div class="text-center py-5 text-muted">
@@ -288,7 +288,7 @@
                 </div>
 
                 <div class="chat-footer">
-                    <form method="POST" id="message-form" enctype="multipart/form-data">
+                    <form method="POST" id="message-form" enctype="multipart/form-data" action="{% url 'chat_room' user_id=other_user.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="message_type" id="message-type" value="text">
                         <input type="hidden" name="file_url" id="file-url" value="">
@@ -371,6 +371,113 @@
         // Scroll to bottom of chat
         const chatMessages = document.getElementById('chat-messages');
         chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Set up auto-refresh for new messages
+        let lastMessageId = getLastMessageId();
+
+        // Function to get the ID of the last message
+        function getLastMessageId() {
+            const allMessages = document.querySelectorAll('.chat-message');
+            if (allMessages.length > 0) {
+                const lastMessage = allMessages[allMessages.length - 1];
+                return lastMessage.getAttribute('data-message-id');
+            }
+            return '0';
+        }
+
+        // Function to check for new messages
+        function checkForNewMessages() {
+            fetch(`{% url 'check_new_messages' user_id=other_user.id %}?last_id=${lastMessageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.new_messages && data.new_messages.length > 0) {
+                        // Update the last message ID
+                        lastMessageId = data.new_messages[data.new_messages.length - 1].id;
+
+                        // Add new messages to the chat
+                        data.new_messages.forEach(message => {
+                            const messageEl = document.createElement('div');
+                            messageEl.className = `chat-message ${message.is_sender ? 'sent' : 'received'}`;
+                            messageEl.setAttribute('data-message-id', message.id);
+
+                            let messageContent = '';
+
+                            if (message.message_type === 'image') {
+                                messageContent = `
+                                    <div class="chat-media-container">
+                                        <img src="${message.file_url || message.message}" class="chat-media" alt="${message.message}" data-bs-toggle="modal" data-bs-target="#imageModal" data-img-src="${message.file_url || message.message}">
+                                        <div class="mt-1 small text-muted">${message.message}</div>
+                                    </div>
+                                `;
+                            } else if (message.message_type === 'video') {
+                                messageContent = `
+                                    <div class="chat-media-container">
+                                        <div class="video-container">
+                                            <video class="chat-video" data-bs-toggle="modal" data-bs-target="#videoModal" data-video-src="${message.file_url || message.message}">
+                                                <source src="${message.file_url || message.message}" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <div class="video-play-button">
+                                                <i class="fas fa-play"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-1 small text-muted">${message.message}</div>
+                                    </div>
+                                `;
+                            } else {
+                                messageContent = message.message;
+                            }
+
+                            messageEl.innerHTML = `
+                                ${messageContent}
+                                <div class="timestamp">${message.timestamp}</div>
+                            `;
+
+                            chatMessages.appendChild(messageEl);
+                        });
+
+                        // Scroll to bottom
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                        // Reinitialize event listeners for new media elements
+                        initializeMediaEventListeners();
+                    }
+                })
+                .catch(error => console.error('Error checking for new messages:', error));
+        }
+
+        // Initialize event listeners for media elements
+        function initializeMediaEventListeners() {
+            // Handle image modal for new images
+            document.querySelectorAll('.chat-media').forEach(image => {
+                image.addEventListener('click', function() {
+                    const imgSrc = this.getAttribute('data-img-src');
+                    const imgAlt = this.getAttribute('alt');
+                    modalImage.src = imgSrc;
+                    modalImageTitle.textContent = imgAlt || 'Image';
+                    downloadImage.href = imgSrc;
+                    downloadImage.setAttribute('download', imgAlt || 'image');
+                });
+            });
+
+            // Handle video modal for new videos
+            document.querySelectorAll('.video-container').forEach(container => {
+                container.addEventListener('click', function() {
+                    const video = this.querySelector('.chat-video');
+                    const videoSrc = video.getAttribute('data-video-src');
+                    const videoName = this.closest('.chat-media-container').querySelector('.text-muted').textContent.trim();
+
+                    modalVideoSource.src = videoSrc;
+                    modalVideo.load();
+                    modalVideoTitle.textContent = videoName || 'Video';
+                    downloadVideo.href = videoSrc;
+                    downloadVideo.setAttribute('download', videoName || 'video');
+                });
+            });
+        }
+
+        // Check for new messages every 3 seconds
+        setInterval(checkForNewMessages, 3000);
 
         // Handle image modal
         const imageModal = document.getElementById('imageModal');
@@ -518,6 +625,11 @@
         messageForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Don't submit empty messages
+            if (!messageInput.value.trim() && !currentFile) {
+                return;
+            }
+
             if (currentFile) {
                 // Upload file first
                 uploadFile(currentFile);
@@ -526,6 +638,11 @@
 
             // Submit the form normally for text messages
             this.submit();
+
+            // Clear the input field after submission
+            setTimeout(() => {
+                messageInput.value = '';
+            }, 100);
         });
 
         // Upload file to server

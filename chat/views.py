@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils.dateformat import format
 from .models import ChatMessage
 import cloudinary
 import cloudinary.uploader
@@ -60,13 +61,17 @@ def chat_room(request, user_id):
     # Handle message submission
     if request.method == 'POST':
         message_text = request.POST.get('message')
+        message_type = request.POST.get('message_type', 'text')
+        file_url = request.POST.get('file_url', '')
 
         if message_text:
             # Create the message
             ChatMessage.objects.create(
                 sender=request.user,
                 receiver=other_user,
-                message=message_text
+                message=message_text,
+                message_type=message_type,
+                file_url=file_url
             )
 
             # If it's an AJAX request, return JSON response
@@ -130,3 +135,40 @@ def upload_file(request):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'No file provided'}, status=400)
+
+@login_required
+def check_new_messages(request, user_id):
+    """
+    Check for new messages since the last message ID.
+    Returns JSON with new messages.
+    """
+    last_id = request.GET.get('last_id', '0')
+
+    try:
+        last_id = int(last_id)
+    except ValueError:
+        last_id = 0
+
+    # Get the other user
+    other_user = get_object_or_404(User, id=user_id)
+
+    # Get new messages between these users
+    new_messages = ChatMessage.objects.filter(
+        (Q(sender=request.user) & Q(receiver=other_user)) |
+        (Q(sender=other_user) & Q(receiver=request.user)),
+        id__gt=last_id
+    ).order_by('timestamp')
+
+    # Format messages for JSON response
+    messages_data = []
+    for message in new_messages:
+        messages_data.append({
+            'id': message.id,
+            'message': message.message,
+            'message_type': message.message_type,
+            'file_url': message.file_url,
+            'is_sender': message.sender == request.user,
+            'timestamp': format(message.timestamp, 'M d, g:i a')
+        })
+
+    return JsonResponse({'new_messages': messages_data})
