@@ -9,6 +9,14 @@ class EventForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 5}),
         }
 
+    def clean_cover_photo(self):
+        cover_photo = self.cleaned_data.get('cover_photo')
+        if cover_photo:
+            # Check file size (10MB limit)
+            if cover_photo.size > 10 * 1024 * 1024:  # 10MB in bytes
+                raise forms.ValidationError("Image file size must be under 10MB.")
+        return cover_photo
+
 class SubEventForm(forms.ModelForm):
     class Meta:
         model = SubEvent
@@ -17,6 +25,14 @@ class SubEventForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 3}),
             'price': forms.NumberInput(attrs={'min': 0, 'step': 0.01}),
         }
+
+    def clean_cover_image(self):
+        cover_image = self.cleaned_data.get('cover_image')
+        if cover_image:
+            # Check file size (10MB limit)
+            if cover_image.size > 10 * 1024 * 1024:  # 10MB in bytes
+                raise forms.ValidationError("Image file size must be under 10MB.")
+        return cover_image
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -34,6 +50,14 @@ class EventGalleryForm(forms.ModelForm):
         widgets = {
             'caption': forms.TextInput(attrs={'placeholder': 'Optional caption for the image'}),
         }
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image:
+            # Check file size (10MB limit)
+            if image.size > 10 * 1024 * 1024:  # 10MB in bytes
+                raise forms.ValidationError("Image file size must be under 10MB.")
+        return image
 
 class ReviewForm(forms.ModelForm):
     class Meta:

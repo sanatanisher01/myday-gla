@@ -15,8 +15,8 @@ class ChatRoomAdmin(admin.ModelAdmin):
 
 @admin.register(ChatMessage)
 class ChatMessageAdmin(admin.ModelAdmin):
-    list_display = ('sender', 'receiver', 'short_message', 'timestamp')
-    list_filter = ('timestamp',)
+    list_display = ('sender', 'receiver', 'short_message', 'message_type', 'timestamp')
+    list_filter = ('timestamp', 'message_type')
     search_fields = ('message', 'sender__username', 'receiver__username')
     readonly_fields = ('timestamp',)
 

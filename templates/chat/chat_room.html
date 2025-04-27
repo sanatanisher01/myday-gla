@@ -647,6 +647,13 @@
 
         // Upload file to server
         function uploadFile(file) {
+            // Check file size (10MB limit)
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+            if (file.size > MAX_FILE_SIZE) {
+                previewContent.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>File size exceeds 10MB limit</div>`;
+                return;
+            }
+
             const formData = new FormData();
             formData.append('file', file);
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');

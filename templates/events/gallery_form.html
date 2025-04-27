@@ -12,12 +12,12 @@
         box-shadow: var(--card-shadow);
         padding: 2rem;
     }
-    
+
     .form-header {
         margin-bottom: 2rem;
         position: relative;
     }
-    
+
     .form-header::after {
         content: '';
         position: absolute;
@@ -27,7 +27,7 @@
         height: 3px;
         background-color: var(--primary-color);
     }
-    
+
     .event-info {
         background-color: rgba(67, 97, 238, 0.05);
         border-radius: var(--border-radius);
@@ -35,7 +35,7 @@
         margin-bottom: 2rem;
         border-left: 4px solid var(--primary-color);
     }
-    
+
     .image-preview {
         width: 100%;
         height: 200px;
@@ -44,11 +44,11 @@
         margin-top: 1rem;
         box-shadow: var(--card-shadow);
     }
-    
+
     .image-preview-container {
         position: relative;
     }
-    
+
     .image-preview-placeholder {
         width: 100%;
         height: 200px;
@@ -60,7 +60,7 @@
         margin-top: 1rem;
         border: 2px dashed #dee2e6;
     }
-    
+
     .image-preview-placeholder i {
         font-size: 3rem;
         color: #adb5bd;
@@ -77,7 +77,7 @@
                     <h1>Add Gallery Image</h1>
                     <p class="text-muted">Upload a new image to your event gallery</p>
                 </div>
-                
+
                 {% if event %}
                 <div class="event-info">
                     <div class="d-flex align-items-center">
@@ -91,13 +91,13 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
-                    
+
                     <div class="mb-4">
                         {{ form.image|as_crispy_field }}
-                        
+
                         <div class="image-preview-container">
                             <div class="image-preview-placeholder" id="image-preview-placeholder">
                                 <i class="fas fa-image"></i>
@@ -105,17 +105,17 @@
                             <img src="" alt="Image Preview" class="image-preview d-none" id="image-preview">
                         </div>
                     </div>
-                    
+
                     <div class="mb-4">
                         {{ form.caption|as_crispy_field }}
                     </div>
-                    
+
                     <div class="mb-4">
                         {{ form.category|as_crispy_field }}
                     </div>
-                    
+
                     <div class="d-flex justify-content-between">
-                        <a href="{% url 'event_gallery' event.slug %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'events:event_gallery' event.slug %}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i> Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -136,12 +136,22 @@
         const imageInput = document.getElementById('id_image');
         const imagePreview = document.getElementById('image-preview');
         const imagePreviewPlaceholder = document.getElementById('image-preview-placeholder');
-        
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
         if (imageInput && imagePreview) {
             imageInput.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
+                    const file = this.files[0];
+
+                    // Check file size
+                    if (file.size > MAX_FILE_SIZE) {
+                        alert('File size exceeds 10MB limit. Please choose a smaller file.');
+                        this.value = ''; // Clear the input
+                        return;
+                    }
+
                     const reader = new FileReader();
-                    
+
                     reader.onload = function(e) {
                         imagePreview.src = e.target.result;
                         imagePreview.classList.remove('d-none');
@@ -149,8 +159,8 @@
                             imagePreviewPlaceholder.classList.add('d-none');
                         }
                     }
-                    
-                    reader.readAsDataURL(this.files[0]);
+
+                    reader.readAsDataURL(file);
                 }
             });
         }

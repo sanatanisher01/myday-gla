@@ -102,6 +102,12 @@ def upload_file(request):
         try:
             file = request.FILES['file']
 
+            # Check file size (10MB limit)
+            if file.size > 10 * 1024 * 1024:  # 10MB in bytes
+                return JsonResponse({
+                    'error': 'File size exceeds 10MB limit'
+                }, status=400)
+
             # Determine file type
             file_name = file.name.lower()
             is_image = file_name.endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'))

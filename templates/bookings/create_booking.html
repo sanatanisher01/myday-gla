@@ -242,7 +242,7 @@
                 console.log('Applying discount code:', discountCode);
 
                 // Send AJAX request to validate discount
-                fetch('{% url "apply_discount" %}', {
+                fetch('{% url "bookings:apply_discount" %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
