@@ -26,6 +26,7 @@ echo "Setting up database..."
 
 # Make the initialization script executable
 chmod +x init_db.py
+chmod +x setup_manager.py
 
 # Check if we're running on Render
 if [ "$RENDER" = "true" ]; then
@@ -66,5 +67,9 @@ else
         }
     }
 fi
+
+# Set up manager user
+echo "Setting up manager user..."
+python setup_manager.py
 
 echo "Build process completed."
