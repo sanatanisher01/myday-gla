@@ -15,7 +15,7 @@
                     <div class="alert alert-warning mb-4">
                         <p class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Are you sure you want to cancel your booking for <strong>{{ booking.event.name }}</strong>?</p>
                     </div>
-                    
+
                     <div class="booking-details mb-4">
                         <h5>Booking Details</h5>
                         <ul class="list-group list-group-flush">
@@ -41,15 +41,15 @@
                             </li>
                         </ul>
                     </div>
-                    
+
                     <div class="alert alert-info mb-4">
                         <p class="mb-0"><i class="fas fa-info-circle me-2"></i> Once cancelled, you cannot undo this action.</p>
                     </div>
-                    
+
                     <form method="POST">
                         {% csrf_token %}
                         <div class="d-flex justify-content-between">
-                            <a href="{% url 'booking_detail' booking.booking_id %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-2"></i> Back
                             </a>
                             <button type="submit" class="btn btn-danger">

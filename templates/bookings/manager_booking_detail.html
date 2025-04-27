@@ -195,7 +195,7 @@
             <p class="text-muted">Viewing details for booking #{{ booking.booking_id|truncatechars:8 }}</p>
         </div>
         <div>
-            <a href="{% url 'manager_bookings' %}" class="btn btn-outline-primary">
+            <a href="{% url 'bookings:manager_bookings' %}" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left me-2"></i> Back to Bookings
             </a>
         </div>
@@ -305,16 +305,16 @@
                 <div class="booking-footer">
                     {% if booking.status == 'pending' %}
                         <div class="d-flex justify-content-end">
-                            <a href="{% url 'reject_booking' booking.booking_id %}" class="btn btn-outline-danger me-2">
+                            <a href="{% url 'bookings:reject_booking' booking.booking_id %}" class="btn btn-outline-danger me-2">
                                 <i class="fas fa-times me-2"></i> Reject Booking
                             </a>
-                            <a href="{% url 'approve_booking' booking.booking_id %}" class="btn btn-success">
+                            <a href="{% url 'bookings:approve_booking' booking.booking_id %}" class="btn btn-success">
                                 <i class="fas fa-check me-2"></i> Approve Booking
                             </a>
                         </div>
                     {% elif booking.status == 'approved' %}
                         <div class="d-flex justify-content-end">
-                            <a href="{% url 'complete_booking' booking.booking_id %}" class="btn btn-primary">
+                            <a href="{% url 'bookings:complete_booking' booking.booking_id %}" class="btn btn-primary">
                                 <i class="fas fa-check-double me-2"></i> Mark as Completed
                             </a>
                         </div>

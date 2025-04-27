@@ -143,7 +143,7 @@
             <p class="text-muted">Manage discount codes for your events</p>
         </div>
         <div>
-            <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-primary me-2">
+            <a href="{% url 'events:manager_dashboard' %}" class="btn btn-outline-primary me-2">
                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
             </a>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createDiscountModal">
@@ -217,10 +217,10 @@
                         </div>
 
                         <div class="discount-card-footer d-flex justify-content-between">
-                            <a href="{% url 'edit_discount' discount.id %}" class="btn btn-outline-primary">
+                            <a href="{% url 'bookings:edit_discount' discount.id %}" class="btn btn-outline-primary">
                                 <i class="fas fa-edit me-1"></i> Edit
                             </a>
-                            <a href="{% url 'delete_discount' discount.id %}" class="btn btn-outline-danger">
+                            <a href="{% url 'bookings:delete_discount' discount.id %}" class="btn btn-outline-danger">
                                 <i class="fas fa-trash-alt me-1"></i> Delete
                             </a>
                         </div>
@@ -253,7 +253,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{% url 'create_discount' %}">
+                <form method="POST" action="{% url 'bookings:create_discount' %}">
                     {% csrf_token %}
                     <div class="row g-3">
                         <div class="col-md-6">

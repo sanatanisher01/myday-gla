@@ -12,12 +12,12 @@
         box-shadow: var(--card-shadow);
         padding: 2rem;
     }
-    
+
     .form-header {
         margin-bottom: 2rem;
         position: relative;
     }
-    
+
     .form-header::after {
         content: '';
         position: absolute;
@@ -27,18 +27,18 @@
         height: 3px;
         background-color: var(--primary-color);
     }
-    
+
     .form-section {
         margin-bottom: 2rem;
     }
-    
+
     .form-section-title {
         font-size: 1.25rem;
         font-weight: 600;
         margin-bottom: 1rem;
         color: var(--primary-color);
     }
-    
+
     .discount-code-input {
         font-family: monospace;
         letter-spacing: 1px;
@@ -56,16 +56,16 @@
                     <p class="text-muted">{% if discount %}Edit existing discount code{% else %}Create a new discount code{% endif %}</p>
                 </div>
                 <div>
-                    <a href="{% url 'discount_list' %}" class="btn btn-outline-primary">
+                    <a href="{% url 'bookings:discount_list' %}" class="btn btn-outline-primary">
                         <i class="fas fa-arrow-left me-2"></i> Back to Discounts
                     </a>
                 </div>
             </div>
-            
+
             <div class="form-container">
                 <form method="POST">
                     {% csrf_token %}
-                    
+
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-tag me-2"></i> Discount Information
@@ -79,7 +79,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-calendar-alt me-2"></i> Validity Period
@@ -93,7 +93,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="fas fa-info-circle me-2"></i> Additional Details
@@ -107,9 +107,9 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'discount_list' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'bookings:discount_list' %}" class="btn btn-outline-secondary">
                             Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -128,7 +128,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Generate random discount code
         const codeInput = document.getElementById('id_code');
-        
+
         if (codeInput && !codeInput.value) {
             const generateRandomCode = function() {
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -138,15 +138,15 @@
                 }
                 return code;
             };
-            
+
             // Add a generate button next to the code input
             const inputGroup = document.createElement('div');
             inputGroup.className = 'input-group';
-            
+
             const parent = codeInput.parentNode;
             parent.insertBefore(inputGroup, codeInput);
             inputGroup.appendChild(codeInput);
-            
+
             const generateBtn = document.createElement('button');
             generateBtn.type = 'button';
             generateBtn.className = 'btn btn-outline-secondary';
@@ -154,9 +154,9 @@
             generateBtn.addEventListener('click', function() {
                 codeInput.value = generateRandomCode();
             });
-            
+
             inputGroup.appendChild(generateBtn);
-            
+
             // Add monospace font to code input
             codeInput.classList.add('discount-code-input');
         }

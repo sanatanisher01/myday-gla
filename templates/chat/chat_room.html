@@ -215,7 +215,7 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-            <a href="{% url 'chat_home' %}" class="btn btn-outline-secondary mb-3">
+            <a href="{% url 'chat:chat_home' %}" class="btn btn-outline-secondary mb-3">
                 <i class="fas fa-arrow-left me-2"></i> Back to Messages
             </a>
         </div>
@@ -288,7 +288,7 @@
                 </div>
 
                 <div class="chat-footer">
-                    <form method="POST" id="message-form" enctype="multipart/form-data" action="{% url 'chat_room' user_id=other_user.id %}">
+                    <form method="POST" id="message-form" enctype="multipart/form-data" action="{% url 'chat:chat_room' user_id=other_user.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="message_type" id="message-type" value="text">
                         <input type="hidden" name="file_url" id="file-url" value="">
@@ -387,7 +387,7 @@
 
         // Function to check for new messages
         function checkForNewMessages() {
-            fetch(`{% url 'check_new_messages' user_id=other_user.id %}?last_id=${lastMessageId}`)
+            fetch(`{% url 'chat:check_new_messages' user_id=other_user.id %}?last_id=${lastMessageId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.new_messages && data.new_messages.length > 0) {
@@ -654,7 +654,7 @@
             // Show loading state
             previewContent.innerHTML = `<div><i class="fas fa-spinner fa-spin me-2"></i>Uploading...</div>`;
 
-            fetch('{% url "upload_file" %}', {
+            fetch('{% url "chat:upload_file" %}', {
                 method: 'POST',
                 body: formData
             })

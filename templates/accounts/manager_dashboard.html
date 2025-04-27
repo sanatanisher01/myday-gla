@@ -101,7 +101,7 @@
             <p class="text-muted">Welcome back, {{ request.user.first_name|default:request.user.username }}! Here's an overview of your business.</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="{% url 'event_create' %}" class="btn btn-primary">
+            <a href="{% url 'events:create_event' %}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i> Create New Event
             </a>
         </div>
@@ -266,7 +266,7 @@
                                         </td>
                                         <td>₹{{ booking.total_price }}</td>
                                         <td>
-                                            <a href="{% url 'booking_detail' booking.booking_id %}" class="btn btn-sm btn-outline-primary">
+                                            <a href="{% url 'bookings:booking_detail' booking.booking_id %}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
@@ -415,7 +415,7 @@
         );
 
         // Fetch analytics data
-        fetch('{% url "booking_analytics" %}')
+        fetch('{% url "bookings:booking_analytics" %}')
             .then(response => response.json())
             .then(data => {
                 // Weekday Chart
