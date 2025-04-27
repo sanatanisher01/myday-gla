@@ -32,14 +32,15 @@ def chat_home(request):
             is_read=False
         ).count()
 
-        if latest_message:
-            chat_list.append({
-                'user': partner,
-                'latest_message': latest_message,
-                'timestamp': latest_message.timestamp,
-                'unread_count': unread_count,
-                'is_manager': partner.profile.is_manager
-            })
+        # Always add the chat partner to the list, even if there's no message yet
+        # This ensures that new chats initiated by managers are shown
+        chat_list.append({
+            'user': partner,
+            'latest_message': latest_message,
+            'timestamp': latest_message.timestamp if latest_message else partner.date_joined,  # Use date_joined as fallback
+            'unread_count': unread_count,
+            'is_manager': partner.profile.is_manager
+        })
 
     # Sort by latest message timestamp
     chat_list.sort(key=lambda x: x['timestamp'], reverse=True)
@@ -132,6 +133,21 @@ def create_chat(request, user_id):
     if not request.user.profile.is_manager and not other_user.profile.is_manager:
         messages.error(request, 'You can only chat with event managers.')
         return redirect('chat:chat_home')
+
+    # Check if there are any existing messages between these users
+    existing_messages = ChatMessage.objects.filter(
+        (Q(sender=request.user) & Q(receiver=other_user)) |
+        (Q(sender=other_user) & Q(receiver=request.user))
+    ).exists()
+
+    # If no existing messages and the current user is a manager, create a welcome message
+    if not existing_messages and request.user.profile.is_manager:
+        welcome_message = f"Hello {other_user.first_name if other_user.first_name else other_user.username}! How can I help you with your event planning today?"
+        ChatMessage.objects.create(
+            sender=request.user,
+            receiver=other_user,
+            message=welcome_message
+        )
 
     # Redirect to the chat room with this user
     return redirect('chat:chat_room', user_id=other_user.id)

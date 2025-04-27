@@ -159,9 +159,13 @@
                                                 {{ chat.user.get_full_name|default:chat.user.username }}
                                                 {% if chat.is_manager %}<span class="badge bg-danger ms-1">Manager</span>{% endif %}
                                             </div>
-                                            {% if chat.latest_message %}
-                                                <div class="chat-time">{{ chat.timestamp|date:"g:i A" }}</div>
-                                            {% endif %}
+                                            <div class="chat-time">
+                                                {% if chat.latest_message %}
+                                                    {{ chat.timestamp|date:"g:i A" }}
+                                                {% else %}
+                                                    {{ chat.timestamp|date:"M d" }}
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <div class="chat-preview {% if chat.unread_count > 0 %}fw-bold{% endif %}">
@@ -174,7 +178,7 @@
                                                         {{ chat.latest_message.message|truncatechars:30 }}
                                                     {% endif %}
                                                 {% else %}
-                                                    No messages yet
+                                                    <i class="fas fa-comment text-primary"></i> New conversation
                                                 {% endif %}
                                             </div>
                                             {% if chat.unread_count > 0 %}
