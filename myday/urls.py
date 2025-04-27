@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import render
 from events import views
+from .health_check import health_check
 
 # Simple view for maintenance page
 def maintenance_view(request):
@@ -32,6 +33,7 @@ urlpatterns = [
     path('bookings/', include('bookings.urls')),
     path('chat/', include('chat.urls')),
     path('maintenance/', maintenance_view, name='maintenance'),  # Direct maintenance page
+    path('health/', health_check, name='health_check'),  # Health check endpoint for Render
     path('', views.home, name='home'),  # Home page view directly included
 ]
 

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /accounts/login/
+Disallow: /accounts/register/
+Disallow: /accounts/profile/
+Disallow: /chat/
+Disallow: /bookings/create/
+Disallow: /bookings/manage/
+Disallow: /health/
+Disallow: /maintenance/
+
+# Sitemap
+Sitemap: https://myday.onrender.com/sitemap.xml

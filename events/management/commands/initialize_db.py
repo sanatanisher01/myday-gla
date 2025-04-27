@@ -16,6 +16,24 @@ class Command(BaseCommand):
         self.stdout.write(f"DATABASE_URL: {os.environ.get('DATABASE_URL', 'not set')}")
         self.stdout.write(f"RENDER env var: {os.environ.get('RENDER', 'not set')}")
 
+        # Check if we're running on Render and if this is a fresh deployment
+        # If DATABASE_URL is set and RENDER is set, we're likely on Render
+        if os.environ.get('DATABASE_URL') and os.environ.get('RENDER'):
+            self.stdout.write("Running on Render with DATABASE_URL set")
+            # For Render deployments, we'll be more cautious with initialization
+            try:
+                self._initialize_data()
+            except Exception as e:
+                self.stdout.write(self.style.WARNING(f"Error during initialization on Render: {e}"))
+                self.stdout.write(self.style.SUCCESS("Continuing deployment despite initialization errors"))
+                return
+        else:
+            # For local development, proceed with normal initialization
+            self._initialize_data()
+
+    def _initialize_data(self, *args, **options):
+        """The actual initialization logic, separated to allow for error handling"""
+
         # Check if tables exist - works with both SQLite and PostgreSQL
         try:
             db_engine = connection.settings_dict['ENGINE']

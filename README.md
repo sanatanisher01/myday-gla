@@ -74,7 +74,40 @@ python manage.py runserver
 
 ### Deployment
 
-To deploy this application to a production environment, you'll need to:
+#### Deploying to Render
+
+This project is configured for easy deployment on Render's free plan:
+
+1. Create a Render account at [render.com](https://render.com)
+
+2. Connect your GitHub repository to Render
+
+3. Click "New" and select "Blueprint" to use the `render.yaml` configuration
+
+4. Set up the required environment variables in the Render dashboard:
+   - `CLOUDINARY_CLOUD_NAME`: Your Cloudinary cloud name
+   - `CLOUDINARY_API_KEY`: Your Cloudinary API key
+   - `CLOUDINARY_API_SECRET`: Your Cloudinary API secret
+   - `EMAIL_HOST_USER`: Your email address for sending emails
+   - `EMAIL_HOST_PASSWORD`: Your email app password
+
+5. Deploy the application
+
+The `render.yaml` file will automatically:
+- Set up a web service running your Django application
+- Create a PostgreSQL database
+- Configure the necessary environment variables
+- Handle the build and deployment process
+
+Render will automatically use:
+- `build.sh` for the build process
+- `requirements.txt` for dependencies
+- `Procfile` for running the application
+- PostgreSQL for the database
+
+#### Manual Deployment
+
+To deploy this application to another production environment, you'll need to:
 
 1. Set up a web server (e.g., Nginx, Apache)
 2. Configure a WSGI server (e.g., Gunicorn, uWSGI)
@@ -82,8 +115,6 @@ To deploy this application to a production environment, you'll need to:
 4. Configure environment variables for production settings
 5. Set up static file serving
 6. Configure SSL/TLS for secure connections
-
-Detailed deployment instructions will depend on your hosting provider and preferences.
 
 ## Email Functionality
 
@@ -131,9 +162,11 @@ python manage.py send_event_reminders --days=1
 - Django: Web framework
 - Bootstrap: Frontend framework
 - Cloudinary: Image storage
-- SQLite: Database
+- PostgreSQL: Production database (SQLite for development)
+- Gunicorn: WSGI HTTP server
 - SMTP: Email sending
 - WhiteNoise: Static file serving
+- Render: Hosting platform
 
 ## License
 

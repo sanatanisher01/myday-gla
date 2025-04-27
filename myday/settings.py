@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'cloudinary_storage',
     'cloudinary',
+    'corsheaders',  # Added for CORS support
     # 'channels',  # Temporarily removed
 
     # Custom apps
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise for static files
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'myday.middleware.DatabaseErrorMiddleware',  # Custom middleware to handle database errors
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
