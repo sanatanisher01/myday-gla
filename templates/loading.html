@@ -80,15 +80,15 @@
     <div class="loading-container">
         <img src="https://res.cloudinary.com/dqxdmayga/image/upload/v1711304834/myday-logo_ixnvxl.png" alt="MyDay Logo" class="logo">
         <h1>Starting MyDay</h1>
-        <p>Our application is waking up from sleep mode. This usually takes about 30-60 seconds on the first visit.</p>
-        
+        <p>Our application is waking up from sleep mode. This usually takes about 1 minute on the first visit.</p>
+
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
-        
+
         <div class="status-message" id="status-message">Initializing application...</div>
-        
-        <button class="reload-btn" id="reload-btn">Reload Page</button>
+
+        <button type="button" class="reload-btn" id="reload-btn">Reload Page</button>
     </div>
 
     <script>
@@ -97,7 +97,7 @@
         let progressInterval;
         let healthCheckInterval;
         let progressValue = 0;
-        let maxWaitTime = 120000; // 2 minutes in milliseconds
+        let maxWaitTime = 60000; // 1 minute in milliseconds
         let healthCheckUrl = '/health/';
         let statusMessages = [
             "Initializing application...",
@@ -108,13 +108,13 @@
             "Finalizing startup..."
         ];
         let currentMessageIndex = 0;
-        
+
         // Start progress animation
         function startProgress() {
             progressInterval = setInterval(() => {
                 // Calculate elapsed time
                 const elapsedTime = Date.now() - startTime;
-                
+
                 // If we've waited too long, show reload button
                 if (elapsedTime > maxWaitTime) {
                     clearInterval(progressInterval);
@@ -123,11 +123,16 @@
                     document.getElementById('reload-btn').style.display = 'inline-block';
                     return;
                 }
-                
+
                 // Update progress bar (max 95% until health check passes)
-                progressValue = Math.min(95, (elapsedTime / 60000) * 100);
+                // Make progress faster at the beginning to give a sense of quick startup
+                if (elapsedTime < 10000) { // First 10 seconds
+                    progressValue = Math.min(60, (elapsedTime / 10000) * 60);
+                } else {
+                    progressValue = Math.min(95, 60 + ((elapsedTime - 10000) / 50000) * 35);
+                }
                 document.getElementById('progress-bar').style.width = progressValue + '%';
-                
+
                 // Cycle through status messages
                 if (elapsedTime > currentMessageIndex * 10000 && currentMessageIndex < statusMessages.length) {
                     document.getElementById('status-message').textContent = statusMessages[currentMessageIndex];
@@ -135,11 +140,11 @@
                 }
             }, 500);
         }
-        
+
         // Check if the application is ready
         function checkHealth() {
             healthCheckInterval = setInterval(() => {
-                fetch(healthCheckUrl)
+                fetch(healthCheckUrl + '?from_loading=true')
                     .then(response => {
                         if (response.ok) {
                             return response.json();
@@ -153,7 +158,7 @@
                             clearInterval(healthCheckInterval);
                             document.getElementById('progress-bar').style.width = '100%';
                             document.getElementById('status-message').textContent = "Application is ready! Redirecting...";
-                            
+
                             // Redirect to home page after a short delay
                             setTimeout(() => {
                                 window.location.href = '/';
@@ -164,14 +169,14 @@
                         console.log('Health check error:', error);
                         // Continue waiting, the error is expected while the app is starting
                     });
-            }, 5000); // Check every 5 seconds
+            }, 2000); // Check every 2 seconds (more frequent checks)
         }
-        
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             startProgress();
             checkHealth();
-            
+
             // Add reload button functionality
             document.getElementById('reload-btn').addEventListener('click', () => {
                 window.location.reload();

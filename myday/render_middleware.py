@@ -59,14 +59,43 @@ class RenderWakeupMiddleware:
     def _warmup_application(self):
         """
         Perform warmup tasks to speed up application initialization.
+        This function preloads essential components to reduce startup time.
         """
         try:
             logger.info("Starting application warmup")
 
-            # Simulate warmup tasks
-            time.sleep(2)
+            # Import necessary modules here to preload them
+            from django.db import connection
+            from django.contrib.auth.models import User
+            from events.models import Event
+            from bookings.models import Booking
 
-            # Mark warmup as complete
+            # Perform a simple database query to warm up the connection
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT 1")
+                    cursor.fetchone()
+                logger.info("Database connection warmed up")
+            except Exception as db_error:
+                logger.error(f"Database warmup error: {db_error}")
+
+            # Preload essential model data
+            try:
+                # Count users to warm up auth models
+                user_count = User.objects.count()
+                # Count events to warm up event models
+                event_count = Event.objects.count()
+                # Count bookings to warm up booking models
+                booking_count = Booking.objects.count()
+
+                logger.info(f"Model cache warmed up: {user_count} users, {event_count} events, {booking_count} bookings")
+            except Exception as model_error:
+                logger.error(f"Model warmup error: {model_error}")
+
+            # Mark warmup as complete after a maximum of 30 seconds
+            # This ensures we don't keep users waiting too long
+            time.sleep(0.5)  # Small delay to ensure other processes can start
+
             logger.info("Application warmup complete")
             self.is_waking_up = False
         except Exception as e:

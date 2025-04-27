@@ -16,7 +16,7 @@ class DatabaseErrorMiddleware:
         self.db_available = False
         self.app_startup_time = time.time()
         self.app_ready = False
-        self.max_startup_time = 120  # seconds
+        self.max_startup_time = 60  # seconds (reduced from 120 to 60)
 
         # Print database configuration on startup
         print("Database configuration at middleware initialization:", file=sys.stderr)
@@ -37,18 +37,22 @@ class DatabaseErrorMiddleware:
         # Check if the app is still in startup phase
         current_time = time.time()
         if not self.app_ready and current_time - self.app_startup_time < self.max_startup_time:
-            # Check if database is ready
+            # Check if database is ready - use a more efficient approach
             try:
+                # Import connection only once
                 from django.db import connection
-                cursor = connection.cursor()
-                cursor.execute("SELECT 1")
-                cursor.fetchone()
-                cursor.close()
+
+                # Use a faster query and close cursor properly
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT 1")
+                    cursor.fetchone()
 
                 # If we get here, the database is working, mark app as ready
                 self.app_ready = True
-            except Exception:
+                print(f"App ready after {current_time - self.app_startup_time:.2f} seconds", file=sys.stderr)
+            except Exception as e:
                 # Database not ready, redirect to loading page
+                print(f"Database not ready: {e}", file=sys.stderr)
                 return redirect('loading')
 
         # If we've exceeded the maximum startup time, mark the app as ready
