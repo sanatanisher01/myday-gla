@@ -334,7 +334,7 @@
                     <div class="customer-info">
                         <div class="customer-avatar">
                             {% if booking.user.profile.profile_picture %}
-                                <img src="{{ booking.user.profile.profile_picture.url }}" alt="{{ booking.user.get_full_name }}" width="64" height="64" style="border-radius: 50%; object-fit: cover;">
+                                <img src="{{ booking.user.profile.profile_picture.url }}" alt="{{ booking.user.get_full_name }}">
                             {% else %}
                                 {{ booking.user.first_name|first|upper }}{{ booking.user.last_name|first|upper }}
                             {% endif %}
@@ -349,7 +349,7 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-primary">
+                        <a href="{% url 'chat:create_chat' user_id=booking.user.id %}" class="btn btn-outline-primary">
                             <i class="fas fa-comment-alt me-2"></i> Message Customer
                         </a>
                     </div>
