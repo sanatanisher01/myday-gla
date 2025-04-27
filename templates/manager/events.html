@@ -12,23 +12,23 @@
         overflow: hidden;
         box-shadow: var(--card-shadow);
     }
-    
+
     .event-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--hover-shadow);
     }
-    
+
     .event-card .card-img-top {
         height: 180px;
         object-fit: cover;
     }
-    
+
     .event-stats {
         display: flex;
         gap: 1rem;
         margin-top: 1rem;
     }
-    
+
     .stat-item {
         background-color: rgba(67, 97, 238, 0.1);
         padding: 0.5rem 1rem;
@@ -38,11 +38,11 @@
         display: flex;
         align-items: center;
     }
-    
+
     .stat-item i {
         margin-right: 0.5rem;
     }
-    
+
     .action-buttons {
         position: absolute;
         top: 10px;
@@ -50,11 +50,11 @@
         opacity: 0;
         transition: all 0.3s ease;
     }
-    
+
     .event-card:hover .action-buttons {
         opacity: 1;
     }
-    
+
     .action-button {
         width: 36px;
         height: 36px;
@@ -67,16 +67,16 @@
         margin-left: 0.5rem;
         transition: all 0.3s ease;
     }
-    
+
     .action-button:hover {
         transform: scale(1.1);
     }
-    
+
     .empty-state {
         text-align: center;
         padding: 3rem;
     }
-    
+
     .empty-state-icon {
         font-size: 4rem;
         color: #ccc;
@@ -92,11 +92,11 @@
             <h1 class="mb-0">My Events</h1>
             <p class="text-muted">Manage all your events in one place</p>
         </div>
-        <a href="{% url 'create_event' %}" class="btn btn-primary">
+        <a href="{% url 'events:create_event' %}" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i> Create New Event
         </a>
     </div>
-    
+
     {% if events %}
         <div class="row g-4">
             {% for event in events %}
@@ -105,13 +105,13 @@
                         <div class="position-relative">
                             <img src="{{ event.cover_photo.url }}" class="card-img-top" alt="{{ event.name }}">
                             <div class="action-buttons d-flex">
-                                <a href="{% url 'edit_event' event.slug %}" class="action-button text-primary" title="Edit Event">
+                                <a href="{% url 'events:edit_event' event.slug %}" class="action-button text-primary" title="Edit Event">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{% url 'event_gallery' event.slug %}" class="action-button text-success" title="Manage Gallery">
+                                <a href="{% url 'events:event_gallery' event.slug %}" class="action-button text-success" title="Manage Gallery">
                                     <i class="fas fa-images"></i>
                                 </a>
-                                <a href="{% url 'delete_event' event.slug %}" class="action-button text-danger" title="Delete Event">
+                                <a href="{% url 'events:delete_event' event.slug %}" class="action-button text-danger" title="Delete Event">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
@@ -119,7 +119,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ event.name }}</h5>
                             <p class="card-text text-muted">{{ event.description|truncatechars:100 }}</p>
-                            
+
                             <div class="event-stats">
                                 <div class="stat-item">
                                     <i class="fas fa-calendar-check"></i>
@@ -132,7 +132,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-transparent border-top-0">
-                            <a href="{% url 'manager_event_detail' event.slug %}" class="btn btn-outline-primary w-100">
+                            <a href="{% url 'events:manager_event_detail' event.slug %}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-chart-line me-2"></i> View Analytics
                             </a>
                         </div>
@@ -148,7 +148,7 @@
                 </div>
                 <h4>No Events Created Yet</h4>
                 <p class="text-muted mb-4">Start by creating your first event to manage bookings and generate revenue.</p>
-                <a href="{% url 'create_event' %}" class="btn btn-primary btn-lg">
+                <a href="{% url 'events:create_event' %}" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus me-2"></i> Create Your First Event
                 </a>
             </div>

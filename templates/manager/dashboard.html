@@ -115,7 +115,7 @@
             <p class="text-muted">Welcome back, {{ request.user.first_name|default:request.user.username }}! Here's an overview of your events and bookings.</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="{% url 'create_event' %}" class="btn btn-primary">
+            <a href="{% url 'events:create_event' %}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i> Create New Event
             </a>
         </div>
@@ -263,7 +263,7 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-6">
-                            <a href="{% url 'create_event' %}" class="text-decoration-none">
+                            <a href="{% url 'events:create_event' %}" class="text-decoration-none">
                                 <div class="quick-action-card text-center h-100">
                                     <div class="action-icon">
                                         <i class="fas fa-calendar-plus"></i>
@@ -332,7 +332,7 @@
                         {% empty %}
                             <div class="list-group-item text-center py-4">
                                 <p class="mb-0">No events created yet</p>
-                                <a href="{% url 'create_event' %}" class="btn btn-primary btn-sm mt-2">
+                                <a href="{% url 'events:create_event' %}" class="btn btn-primary btn-sm mt-2">
                                     <i class="fas fa-plus me-2"></i> Create Event
                                 </a>
                             </div>
