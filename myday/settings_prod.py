@@ -81,13 +81,13 @@ if DATABASE_URL:
             default=DATABASE_URL,
             conn_max_age=600,  # Keep connections open for 10 minutes
             conn_health_checks=True,  # Check connection health before using
-            ssl_require=True,  # Required for Render PostgreSQL
+            ssl_require=False,  # Set to False for Render internal connections
         )
     }
 
     # Add connection pooling options for better performance
     DATABASES['default']['OPTIONS'] = {
-        'connect_timeout': 10,  # 10 seconds connection timeout
+        'connect_timeout': 30,  # 30 seconds connection timeout
         'keepalives': 1,  # Enable keepalives
         'keepalives_idle': 60,  # Seconds between keepalives
         'keepalives_interval': 10,  # Seconds between keepalive probes

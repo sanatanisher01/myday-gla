@@ -42,17 +42,51 @@ if [ "$RENDER" = "true" ]; then
     # For Render, we need to handle the database differently
     echo "Setting up database on Render..."
 
-    # First, try to run migrations with --fake-initial to handle existing tables
-    python manage.py migrate --fake-initial || {
-        echo "Initial migrations failed, trying with --fake..."
+    # Check if DATABASE_URL is set
+    if [ -n "$DATABASE_URL" ]; then
+        echo "Using PostgreSQL database from DATABASE_URL"
 
-        # If that fails, try with --fake
-        python manage.py migrate --fake || {
-            echo "Fake migrations failed, trying to reset the database..."
+        # Force using settings_prod for migrations
+        export DJANGO_SETTINGS_MODULE=myday.settings_prod
 
-            # If all else fails, try to reset the database
-            python init_db.py || {
-                echo "Database reset failed, but continuing build process..."
+        # First, try to run migrations with --fake-initial to handle existing tables
+        echo "Running migrations on PostgreSQL database..."
+        python manage.py migrate --fake-initial || {
+            echo "Initial migrations failed, trying with --fake..."
+
+            # If that fails, try with --fake
+            python manage.py migrate --fake || {
+                echo "Fake migrations failed, trying with standard migrations..."
+
+                # Try standard migrations as a last resort
+                python manage.py migrate || {
+                    echo "All migration attempts failed, trying to reset PostgreSQL database..."
+
+                    # Make the reset script executable
+                    chmod +x reset_postgres.py
+
+                    # Try to reset the PostgreSQL database
+                    python reset_postgres.py || {
+                        echo "PostgreSQL database reset failed, but continuing build process..."
+                    }
+                }
+            }
+        }
+    else
+        echo "Using SQLite database for local development"
+
+        # First, try to run migrations with --fake-initial to handle existing tables
+        python manage.py migrate --fake-initial || {
+            echo "Initial migrations failed, trying with --fake..."
+
+            # If that fails, try with --fake
+            python manage.py migrate --fake || {
+                echo "Fake migrations failed, trying to reset the database..."
+
+                # If all else fails, try to reset the database
+                python init_db.py || {
+                    echo "Database reset failed, but continuing build process..."
+                }
             }
         }
     }
