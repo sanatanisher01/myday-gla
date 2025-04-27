@@ -357,17 +357,17 @@ def create_discount(request):
                 discount.save()
 
                 messages.success(request, f'Discount code {code} created successfully!')
-                return redirect('discount_list')
+                return redirect('bookings:discount_list')
             except Exception as e:
                 messages.error(request, f'Error creating discount: {str(e)}')
-                return redirect('discount_list')
+                return redirect('bookings:discount_list')
         else:
             # Coming from the full form in discount_form.html
             form = DiscountForm(request.POST)
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Discount created successfully!')
-                return redirect('discount_list')
+                return redirect('bookings:discount_list')
     else:
         form = DiscountForm()
 
@@ -392,7 +392,7 @@ def edit_discount(request, discount_id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Discount updated successfully!')
-            return redirect('discount_list')
+            return redirect('bookings:discount_list')
     else:
         form = DiscountForm(instance=discount)
 
@@ -416,7 +416,7 @@ def delete_discount(request, discount_id):
     if request.method == 'POST':
         discount.delete()
         messages.success(request, 'Discount deleted successfully!')
-        return redirect('discount_list')
+        return redirect('bookings:discount_list')
 
     context = {
         'discount': discount
