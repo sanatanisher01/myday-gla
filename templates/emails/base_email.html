@@ -14,7 +14,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         .email-container {
             max-width: 600px;
             margin: 0 auto;
@@ -23,32 +23,32 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        
+
         .email-header {
             background-color: #4361ee;
             color: white;
             padding: 20px;
             text-align: center;
         }
-        
+
         .email-logo {
             margin-bottom: 15px;
         }
-        
+
         .email-logo img {
             max-height: 50px;
         }
-        
+
         .email-title {
             margin: 0;
             font-size: 24px;
             font-weight: 600;
         }
-        
+
         .email-content {
             padding: 30px;
         }
-        
+
         .email-footer {
             background-color: #f8f9fa;
             padding: 20px;
@@ -57,7 +57,7 @@
             color: #6c757d;
             border-top: 1px solid #e9ecef;
         }
-        
+
         /* Button styles */
         .btn {
             display: inline-block;
@@ -70,47 +70,47 @@
             margin: 20px 0;
             text-align: center;
         }
-        
+
         .btn:hover {
             background-color: #3a56d4;
         }
-        
+
         /* Utility classes */
         .text-center {
             text-align: center;
         }
-        
+
         .mt-4 {
             margin-top: 20px;
         }
-        
+
         .mb-4 {
             margin-bottom: 20px;
         }
-        
+
         /* Table styles */
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
-        
+
         th {
             background-color: #f8f9fa;
             padding: 10px;
             text-align: left;
             border-bottom: 2px solid #e9ecef;
         }
-        
+
         td {
             padding: 10px;
             border-bottom: 1px solid #e9ecef;
         }
-        
+
         .social-links {
             margin-top: 20px;
         }
-        
+
         .social-links a {
             display: inline-block;
             margin: 0 10px;
@@ -123,26 +123,27 @@
     <div class="email-container">
         <div class="email-header">
             <div class="email-logo">
-                <h1 style="margin:0; color:white; font-size:28px;">My<span style="color:#ffffff; font-weight:bold;">Day</span></h1>
+                <img src="https://res.cloudinary.com/dqxdmayga/image/upload/v1711304834/myday-logo-white_ixnvxl.png" alt="MyDay Logo" style="max-height: 50px;">
             </div>
             <h2 class="email-title">{% block header_title %}{% endblock %}</h2>
         </div>
-        
+
         <div class="email-content">
             {% block content %}{% endblock %}
         </div>
-        
+
         <div class="email-footer">
             <p>&copy; {% now "Y" %} MyDay. All rights reserved.</p>
-            <p>123 Event Street, City | info@myday.com | (123) 456-7890</p>
-            
+            <p>GLA University, Mathura | info@myday.com | +91 9876543210</p>
+            <p>Made with <span style="color: #e25555;">❤</span> at GLA University</p>
+
             <div class="social-links">
-                <a href="#">Facebook</a> | 
-                <a href="#">Twitter</a> | 
-                <a href="#">Instagram</a> | 
+                <a href="#">Facebook</a> |
+                <a href="#">Twitter</a> |
+                <a href="#">Instagram</a> |
                 <a href="#">LinkedIn</a>
             </div>
-            
+
             <p class="mt-4">If you have any questions, please contact our support team.</p>
         </div>
     </div>

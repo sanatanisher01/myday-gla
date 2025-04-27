@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db.models import Avg, Sum, Count, Q, F
 from django.http import JsonResponse
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
 from datetime import timedelta
 import json
 import calendar
@@ -21,7 +23,7 @@ def register(request):
             username = form.cleaned_data.get('username')
 
             # Send welcome email
-            email_sent = send_welcome_email(user)
+            email_sent = send_welcome_email(user, request)
 
             if email_sent:
                 messages.success(request, f'Account created for {username}! A welcome email has been sent to your email address. You can now log in.')
@@ -85,6 +87,35 @@ def edit_profile(request):
 def manager_dashboard(request):
     # This view is deprecated - redirect to the events manager dashboard
     return redirect('events:manager_dashboard')
+
+
+class CustomPasswordResetView(PasswordResetView):
+    """
+    Custom password reset view to use our custom email template
+    """
+    template_name = 'accounts/password_reset.html'
+    email_template_name = 'emails/password_reset.html'
+    success_url = reverse_lazy('accounts:password_reset_done')
+
+    def form_valid(self, form):
+        """
+        Add site_url to the context for the email template
+        """
+        # Get the protocol (http or https)
+        protocol = 'https' if self.request.is_secure() else 'http'
+
+        # Get the host (domain)
+        host = self.request.get_host()
+
+        # Construct the full site URL
+        site_url = f"{protocol}://{host}"
+
+        # Add site_url to the context
+        self.extra_email_context = {
+            'site_url': site_url
+        }
+
+        return super().form_valid(form)
 
 @login_required
 def booking_analytics(request):

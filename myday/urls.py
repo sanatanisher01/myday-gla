@@ -26,6 +26,10 @@ from .health_check import health_check
 def maintenance_view(request):
     return render(request, 'maintenance.html')
 
+# Loading page view
+def loading_view(request):
+    return render(request, 'loading.html')
+
 # Static home page for initial deployment
 def static_home_view(request):
     from django.http import FileResponse
@@ -49,6 +53,7 @@ urlpatterns = [
     path('bookings/', include('bookings.urls')),
     path('chat/', include('chat.urls')),
     path('maintenance/', maintenance_view, name='maintenance'),  # Direct maintenance page
+    path('loading/', loading_view, name='loading'),  # Loading page for app startup
     path('health/', health_check, name='health_check'),  # Health check endpoint for Render
     path('', views.home, name='home'),  # Use the regular home view instead of static
 ]

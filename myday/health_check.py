@@ -3,8 +3,10 @@ from django.db import connection
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 from django.conf import settings
+from django.shortcuts import render
 import sys
 import os
+import time
 
 @never_cache
 @require_GET
@@ -21,6 +23,9 @@ def health_check(request):
         response["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
         response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
         return response
+
+    # Record the start time of the health check
+    start_time = time.time()
 
     status = {
         "status": "healthy",
@@ -59,6 +64,11 @@ def health_check(request):
         status["status"] = "unhealthy"
         status["database"] = str(e)
         print(f"Health check database error: {e}", file=sys.stderr)
+
+    # Calculate response time
+    end_time = time.time()
+    response_time = end_time - start_time
+    status["response_time_ms"] = round(response_time * 1000, 2)
 
     # Return status with appropriate HTTP status code
     status_code = 200 if status["status"] in ["healthy", "warning"] else 503

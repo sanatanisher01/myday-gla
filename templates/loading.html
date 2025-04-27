@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starting MyDay - Please Wait</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .loading-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #4361ee;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #4361ee;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .status-message {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 20px;
+            min-height: 20px;
+        }
+        .reload-btn {
+            display: none;
+            background-color: #4361ee;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .reload-btn:hover {
+            background-color: #3a56d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <img src="https://res.cloudinary.com/dqxdmayga/image/upload/v1711304834/myday-logo_ixnvxl.png" alt="MyDay Logo" class="logo">
+        <h1>Starting MyDay</h1>
+        <p>Our application is waking up from sleep mode. This usually takes about 30-60 seconds on the first visit.</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="status-message" id="status-message">Initializing application...</div>
+        
+        <button class="reload-btn" id="reload-btn">Reload Page</button>
+    </div>
+
+    <script>
+        // Variables to track progress and status
+        let startTime = Date.now();
+        let progressInterval;
+        let healthCheckInterval;
+        let progressValue = 0;
+        let maxWaitTime = 120000; // 2 minutes in milliseconds
+        let healthCheckUrl = '/health/';
+        let statusMessages = [
+            "Initializing application...",
+            "Starting web server...",
+            "Connecting to database...",
+            "Loading application components...",
+            "Almost there...",
+            "Finalizing startup..."
+        ];
+        let currentMessageIndex = 0;
+        
+        // Start progress animation
+        function startProgress() {
+            progressInterval = setInterval(() => {
+                // Calculate elapsed time
+                const elapsedTime = Date.now() - startTime;
+                
+                // If we've waited too long, show reload button
+                if (elapsedTime > maxWaitTime) {
+                    clearInterval(progressInterval);
+                    clearInterval(healthCheckInterval);
+                    document.getElementById('status-message').textContent = "It's taking longer than expected. Please try reloading.";
+                    document.getElementById('reload-btn').style.display = 'inline-block';
+                    return;
+                }
+                
+                // Update progress bar (max 95% until health check passes)
+                progressValue = Math.min(95, (elapsedTime / 60000) * 100);
+                document.getElementById('progress-bar').style.width = progressValue + '%';
+                
+                // Cycle through status messages
+                if (elapsedTime > currentMessageIndex * 10000 && currentMessageIndex < statusMessages.length) {
+                    document.getElementById('status-message').textContent = statusMessages[currentMessageIndex];
+                    currentMessageIndex++;
+                }
+            }, 500);
+        }
+        
+        // Check if the application is ready
+        function checkHealth() {
+            healthCheckInterval = setInterval(() => {
+                fetch(healthCheckUrl)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Health check failed');
+                    })
+                    .then(data => {
+                        if (data.status === 'healthy') {
+                            // Application is ready, complete progress and redirect
+                            clearInterval(progressInterval);
+                            clearInterval(healthCheckInterval);
+                            document.getElementById('progress-bar').style.width = '100%';
+                            document.getElementById('status-message').textContent = "Application is ready! Redirecting...";
+                            
+                            // Redirect to home page after a short delay
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 1000);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Health check error:', error);
+                        // Continue waiting, the error is expected while the app is starting
+                    });
+            }, 5000); // Check every 5 seconds
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            startProgress();
+            checkHealth();
+            
+            // Add reload button functionality
+            document.getElementById('reload-btn').addEventListener('click', () => {
+                window.location.reload();
+            });
+        });
+    </script>
+</body>
+</html>

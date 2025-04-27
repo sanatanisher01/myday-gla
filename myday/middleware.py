@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.utils import OperationalError, ProgrammingError, InterfaceError
 from django.conf import settings
+from django.urls import reverse
 import sys
 import os
 import time
@@ -13,6 +14,9 @@ class DatabaseErrorMiddleware:
         self.last_check_time = 0
         self.check_interval = 60  # seconds between checks
         self.db_available = False
+        self.app_startup_time = time.time()
+        self.app_ready = False
+        self.max_startup_time = 120  # seconds
 
         # Print database configuration on startup
         print("Database configuration at middleware initialization:", file=sys.stderr)
@@ -20,14 +24,36 @@ class DatabaseErrorMiddleware:
         print(f"Database name: {settings.DATABASES['default']['NAME']}", file=sys.stderr)
 
     def __call__(self, request):
-        # Skip database check for static files, health check, and maintenance page
+        # Skip database check for static files, health check, maintenance page, and loading page
         if (request.path.startswith('/static/') or
             request.path == '/maintenance/' or
+            request.path == '/loading/' or
             request.path.startswith('/health') or
             request.path == '/favicon.ico' or
             request.method == 'HEAD' or
             request.method == 'OPTIONS'):
             return self.get_response(request)
+
+        # Check if the app is still in startup phase
+        current_time = time.time()
+        if not self.app_ready and current_time - self.app_startup_time < self.max_startup_time:
+            # Check if database is ready
+            try:
+                from django.db import connection
+                cursor = connection.cursor()
+                cursor.execute("SELECT 1")
+                cursor.fetchone()
+                cursor.close()
+
+                # If we get here, the database is working, mark app as ready
+                self.app_ready = True
+            except Exception:
+                # Database not ready, redirect to loading page
+                return redirect('loading')
+
+        # If we've exceeded the maximum startup time, mark the app as ready
+        if current_time - self.app_startup_time >= self.max_startup_time:
+            self.app_ready = True
 
         # If we're using SQLite, we can proceed without checking connection
         if 'sqlite3' in settings.DATABASES['default']['ENGINE']:

@@ -78,10 +78,10 @@ def create_booking(request, event_slug):
             booking.save()
 
             # Send booking confirmation email
-            send_booking_confirmation(booking)
+            send_booking_confirmation(booking, request)
 
             messages.success(request, 'Your booking has been submitted successfully! A confirmation email has been sent to your email address.')
-            return redirect('booking_detail', booking_id=booking.booking_id)
+            return redirect('bookings:booking_detail', booking_id=booking.booking_id)
     else:
         form = BookingForm()
 
@@ -125,21 +125,21 @@ def cancel_booking(request, booking_id):
     # Only allow cancellation if booking is pending
     if booking.status != 'pending':
         messages.error(request, 'You can only cancel pending bookings.')
-        return redirect('booking_detail', booking_id=booking_id)
+        return redirect('bookings:booking_detail', booking_id=booking_id)
 
     if request.method == 'POST':
         booking.status = 'cancelled'
         booking.save()
 
         # Send booking cancelled email
-        email_sent = send_booking_cancelled(booking)
+        email_sent = send_booking_cancelled(booking, request)
 
         if email_sent:
             messages.success(request, 'Your booking has been cancelled. A confirmation email has been sent to your email address.')
         else:
             messages.success(request, 'Your booking has been cancelled.')
 
-        return redirect('my_bookings')
+        return redirect('bookings:my_bookings')
 
     context = {
         'booking': booking
@@ -245,21 +245,21 @@ def approve_booking(request, booking_id):
 
     if booking.status != 'pending':
         messages.error(request, 'You can only approve pending bookings.')
-        return redirect('manager_booking_detail', booking_id=booking_id)
+        return redirect('bookings:manager_booking_detail', booking_id=booking_id)
 
     if request.method == 'POST':
         booking.status = 'approved'
         booking.save()
 
         # Send booking approved email
-        email_sent = send_booking_approved(booking)
+        email_sent = send_booking_approved(booking, request)
 
         if email_sent:
             messages.success(request, 'Booking has been approved and the customer has been notified via email.')
         else:
             messages.success(request, 'Booking has been approved, but there was an issue sending the email notification.')
 
-        return redirect('manager_bookings')
+        return redirect('bookings:manager_bookings')
 
     context = {
         'booking': booking
@@ -278,21 +278,21 @@ def reject_booking(request, booking_id):
 
     if booking.status != 'pending':
         messages.error(request, 'You can only reject pending bookings.')
-        return redirect('manager_booking_detail', booking_id=booking_id)
+        return redirect('bookings:manager_booking_detail', booking_id=booking_id)
 
     if request.method == 'POST':
         booking.status = 'rejected'
         booking.save()
 
         # Send booking rejected email
-        email_sent = send_booking_rejected(booking)
+        email_sent = send_booking_rejected(booking, request)
 
         if email_sent:
             messages.success(request, 'Booking has been rejected and the customer has been notified via email.')
         else:
             messages.success(request, 'Booking has been rejected, but there was an issue sending the email notification.')
 
-        return redirect('manager_bookings')
+        return redirect('bookings:manager_bookings')
 
     context = {
         'booking': booking
