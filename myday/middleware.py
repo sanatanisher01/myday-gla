@@ -48,8 +48,9 @@ class DatabaseErrorMiddleware:
                 # If we get here, the database is working, mark app as ready
                 self.app_ready = True
             except Exception:
-                # Database not ready, redirect to loading page
-                return redirect('loading')
+                # Database not ready, but don't redirect to loading page
+                # Let Render handle the startup process
+                pass
 
         # If we've exceeded the maximum startup time, mark the app as ready
         if current_time - self.app_startup_time >= self.max_startup_time:

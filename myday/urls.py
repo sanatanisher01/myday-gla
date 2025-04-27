@@ -53,7 +53,7 @@ urlpatterns = [
     path('bookings/', include('bookings.urls')),
     path('chat/', include('chat.urls')),
     path('maintenance/', maintenance_view, name='maintenance'),  # Direct maintenance page
-    path('loading/', loading_view, name='loading'),  # Loading page for app startup
+    path('loading/', loading_view, name='loading'),  # Loading page (manual access only, not used for redirects)
     path('health/', health_check, name='health_check'),  # Health check endpoint for Render
     path('', views.home, name='home'),  # Use the regular home view instead of static
 ]

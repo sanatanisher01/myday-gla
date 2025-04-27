@@ -61,8 +61,7 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 # Add compression middleware for faster page loads
 MIDDLEWARE.insert(2, 'django.middleware.gzip.GZipMiddleware')
 
-# Add Render wakeup middleware for handling sleep mode
-MIDDLEWARE.insert(3, 'myday.render_middleware.RenderWakeupMiddleware')
+# Removed custom Render wakeup middleware to use Render's default behavior
 
 # Add FetchFromCacheMiddleware at the end
 MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')
