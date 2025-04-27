@@ -12,7 +12,14 @@ pip install -r requirements.txt
 
 # Collect static files
 echo "Collecting static files..."
-python manage.py collectstatic --no-input --clear
+# Force collectstatic to run with settings_prod
+DJANGO_SETTINGS_MODULE=myday.settings_prod python manage.py collectstatic --no-input --clear
+
+# Create a simple favicon.ico file if it doesn't exist
+if [ ! -f "staticfiles/favicon.ico" ]; then
+    echo "Creating a simple favicon.ico file..."
+    touch staticfiles/favicon.ico
+fi
 
 # Database setup
 echo "Setting up database..."

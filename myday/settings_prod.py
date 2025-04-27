@@ -69,7 +69,8 @@ MIDDLEWARE.append('django.middleware.cache.FetchFromCacheMiddleware')
 
 # Static files configuration
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Use a simpler storage that doesn't require a manifest
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Configure database using DATABASE_URL environment variable
 DATABASE_URL = os.environ.get('DATABASE_URL')

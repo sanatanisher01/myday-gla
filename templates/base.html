@@ -7,10 +7,10 @@
     <title>{% block title %}MyDay - Event Booking & Management{% endblock %}</title>
 
     <!-- Favicons -->
-    <link rel="icon" href="{% static 'images/logos/myday-logo.png' %}" type="image/png" class="favicon-round">
-    <link rel="shortcut icon" href="{% static 'images/logos/myday-logo.png' %}" type="image/png">
-    <link rel="apple-touch-icon" href="{% static 'images/logos/myday-logo.png' %}">
-    <meta name="msapplication-TileImage" content="{% static 'images/logos/myday-logo.png' %}">
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <!-- Simplified to avoid static file issues -->
+    <meta name="msapplication-TileColor" content="#2b5797">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -55,7 +55,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/logos/myday-logo.png' %}" alt="MyDay Logo" width="45" height="45">
+                <!-- Use text instead of image to avoid static file issues -->
+                <span class="fw-bold fs-4">MyDay</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation" title="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -156,7 +157,7 @@
                     <!-- Company Info -->
                     <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                         <div class="footer-logo-wrapper">
-                            <img src="{% static 'images/logos/myday-logo.png' %}" alt="MyDay Logo" class="footer-logo" width="45" height="45">
+                            <!-- Use text only to avoid static file issues -->
                             <span class="footer-logo-text">MyDay</span>
                         </div>
                         <p class="footer-about mt-3">Your premier destination for event booking and management. We make your special occasions truly memorable.</p>
