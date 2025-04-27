@@ -79,7 +79,7 @@ def chat_room(request, user_id):
                 return JsonResponse({'status': 'success'})
 
             # Otherwise redirect back to the chat room
-            return redirect('chat_room', user_id=user_id)
+            return redirect('chat:chat_room', user_id=user_id)
 
     context = {
         'other_user': other_user,
@@ -94,7 +94,7 @@ def create_chat(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
 
     # Redirect to the chat room with this user
-    return redirect('chat_room', user_id=other_user.id)
+    return redirect('chat:chat_room', user_id=other_user.id)
 
 @login_required
 def upload_file(request):
