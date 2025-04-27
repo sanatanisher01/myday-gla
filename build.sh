@@ -89,7 +89,7 @@ if [ "$RENDER" = "true" ]; then
                 }
             }
         }
-    }
+    fi
 else
     # Database setup for local development
     echo "Setting up database for local development..."
