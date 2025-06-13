@@ -2,6 +2,13 @@
 # exit on error
 set -o errexit
 
+# Create and activate Python virtual environment
+echo "Creating Python virtual environment..."
+python3 -m venv venv
+
+echo "Activating virtual environment..."
+source venv/bin/activate
+
 # Create necessary directories
 echo "Creating necessary directories..."
 mkdir -p static media staticfiles
