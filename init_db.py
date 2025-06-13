@@ -12,7 +12,7 @@ import sys
 import django
 
 # Set up Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings_prod')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myday.settings')
 django.setup()
 
 from django.db import connection
@@ -40,48 +40,6 @@ def main():
 
         tables = [row[0] for row in cursor.fetchall()]
         print(f"Tables in database: {tables}")
-
-    # Handle database initialization differently on Render
-    if is_render:
-        print("Running on Render - checking database state...")
-
-        # Check if we have migration issues
-        if 'django_migrations' in tables and 'auth_user' not in tables:
-            print("Migration table exists but auth_user doesn't. Recreating tables...")
-
-            # Close the connection before attempting to modify the database
-            connection.close()
-
-            # For SQLite, we can try to delete the database file
-            if 'sqlite3' in connection.settings_dict['ENGINE']:
-                db_file = connection.settings_dict['NAME']
-                if os.path.exists(db_file):
-                    try:
-                        os.remove(db_file)
-                        print(f"Deleted SQLite database file: {db_file}")
-                    except Exception as e:
-                        print(f"Error deleting SQLite database file: {e}")
-
-            # For PostgreSQL, we can try to drop all tables
-            elif 'postgresql' in connection.settings_dict['ENGINE']:
-                try:
-                    # Reconnect to the database
-                    connection.connect()
-                    with connection.cursor() as cursor:
-                        cursor.execute("DROP SCHEMA public CASCADE;")
-                        cursor.execute("CREATE SCHEMA public;")
-                        print("Reset PostgreSQL schema")
-                except Exception as e:
-                    print(f"Error resetting PostgreSQL schema: {e}")
-
-            # Reconnect to the database
-            try:
-                connection.connect()
-                print("Reconnected to database")
-            except Exception as e:
-                print(f"Error reconnecting to database: {e}")
-        else:
-            print("Database appears to be in a valid state, proceeding with migrations")
 
     # Run migrations
     print("Running migrations...")

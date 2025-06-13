@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-hy&j5v%e!bxdub681qn3))0*ik-yq9#y0b0!5x0if$t_a3c(mi')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.ngrok-free.app']  # Allow localhost and ngrok domains
 
@@ -173,9 +173,9 @@ WHITENOISE_MAX_AGE = 31536000 if not DEBUG else 0  # 1 year in production
 # File Storage settings
 # Using Cloudinary for media storage
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', '')
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dbxwr2avj'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '353298813117544'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', '0-tBjIKSrVMiYFaN9AxNleOV-eg')
 }
 
 # Only use Cloudinary if credentials are provided
@@ -198,8 +198,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'sanataniaryan010@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'uodh xzmk jbns abag')
 DEFAULT_FROM_EMAIL = 'aryansanatani01@gmail.com'  # Default sender email address
 
 # Authentication settings
